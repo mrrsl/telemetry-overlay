@@ -1,5 +1,7 @@
 #include "procdatasource.hpp"
 
+#include <array>
+
 ProcData::ProcData() {
     pLocate = NULL;
     pServ = NULL;
@@ -68,9 +70,10 @@ HANDLE ProcData::getFgProcHandle() {
     DWORD procId = GetWindowThreadProcessId(hForeground, NULL);
     if (procId == 0)
         return NULL;
-    if (procId == lastProc) {
+    if (procId == lastProc)
         return lastProcHandle;
-    }
+    if (lastProcHandle != NULL)
+        CloseHandle(lastProcHandle);
     lastProc = procId;
     lastProcHandle = OpenProcess(PROCESS_QUERY_INFORMATION, FALSE, procId);
     return lastProcHandle;
@@ -111,4 +114,16 @@ unsigned long ProcData::getFgProcessMemory() {
     PROCESS_MEMORY_COUNTERS pc;
     if (lastProcHandle == NULL)
         return 0;
+}
+
+QString ProcData::getFgProcessName() {
+    using std::array;
+    constexpr unsigned long nameBufferSize = 256;
+
+    getFgProcHandle();
+    auto titleBuffer = array<WCHAR, nameBufferSize>();
+    HWND fgWindow = GetForegroundWindow();
+    GetWindowText(fgWindow, titleBuffer.data(), nameBufferSize);
+
+    return QString::fromWCharArray(titleBuffer.data());
 }

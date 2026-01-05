@@ -1,3 +1,9 @@
+/*
+API wrapper for retrieving process telemetry from Windows.
+The goal is to simplify retrieval of data on resources used by the foreground process.
+Ideally, avoid export of any OS-specific types and only return standard types to keep things portable.
+*/
+
 #ifndef PROC_DATA_SOURCE_HH
 #define PROC_DATA_SOURCE_HH
 
@@ -6,6 +12,9 @@
 #include <windows.h>
 #include <wbemidl.h>
 #include <Psapi.h>
+#include <WinBase.h>
+
+#include <string>
 
 #pragma comment(lib, "wbemuuid.lib")
 
@@ -28,6 +37,7 @@ class ProcData {
     /** Gets the handle for the process that created the current foreground window. */
     HANDLE getFgProcHandle();
 
+    /** Returns the sum of two `FILETIME` structures as a 128 bit integer. */
     static unsigned long long filetimeSum(FILETIME, FILETIME);
 public:
     /** Sets up program to make necessary WMI calls. Check */
@@ -58,6 +68,11 @@ public:
      */
     unsigned long getFgProcessMemory();
     
+    /**
+     * Get the path of the foreground process.
+     * @return Empty string if the call to `QueryFullProcessImageName` fails.
+     */
+    std::string getFgProcessName();
 };
 
 #endif
