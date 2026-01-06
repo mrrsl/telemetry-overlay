@@ -1,5 +1,8 @@
 #include "procdatasource.hpp"
 
+#include <QRegularExpression>
+#include <QRegularExpressionMatch>
+
 #include <array>
 
 ProcData::ProcData() {
@@ -109,21 +112,34 @@ unsigned long long ProcData::getTotalCpuTime() {
     return ProcData::filetimeSum(kTime, uTime);
 }
 
-unsigned long ProcData::getFgProcessMemory() {
+unsigned long long ProcData::getFgProcessMemory() {
     HANDLE hProc = getFgProcHandle();
     PROCESS_MEMORY_COUNTERS pc;
     if (lastProcHandle == NULL)
         return 0;
+
+    BOOL queryRes = GetProcessMemoryInfo(hProc, &pc, sizeof(pc));
+    if (queryRes == TRUE)
+        return pc.WorkingSetSize;
+    else return 0;
 }
 
 QString ProcData::getFgProcessName() {
     using std::array;
     constexpr unsigned long nameBufferSize = 256;
+    const QRegularExpression pathEndRegexp(R"([\\^].+?$)");
 
     getFgProcHandle();
     auto titleBuffer = array<WCHAR, nameBufferSize>();
     HWND fgWindow = GetForegroundWindow();
     GetWindowText(fgWindow, titleBuffer.data(), nameBufferSize);
 
-    return QString::fromWCharArray(titleBuffer.data());
+    QString title = QString::fromWCharArray(titleBuffer.data());
+    QRegularExpressionMatch matches = pathEndRegexp.match(title);
+
+    if (matches.hasMatch()) {
+        return matches.captured(0);
+    } else {
+        return QString("");
+    }
 }

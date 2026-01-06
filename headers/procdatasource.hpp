@@ -14,7 +14,7 @@ Ideally, avoid export of any OS-specific types and only return standard types to
 #include <Psapi.h>
 #include <WinBase.h>
 
-#include <string>
+#include <QString>
 
 #pragma comment(lib, "wbemuuid.lib")
 
@@ -64,15 +64,15 @@ public:
 
     /**
      * Gets the amount of memory in bytes allocated by the current foreground process.
-     * @return Returns 0 if the last cached process has a `NULL` handle.
+     * @return Returns 0 on any unsuccessful `win32` call.
      */
-    unsigned long getFgProcessMemory();
+    unsigned long long getFgProcessMemory();
     
     /**
      * Get the path of the foreground process.
      * @return Empty string if the call to `QueryFullProcessImageName` fails.
      */
-    std::string getFgProcessName();
+    QString getFgProcessName();
 };
 
 #endif
