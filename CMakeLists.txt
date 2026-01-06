@@ -5,6 +5,7 @@ project(hmon VERSION 0.1 LANGUAGES CXX)
 include(FetchContent)
 
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
+set(CMAKE_CXX_STANDARD 20)
 
 find_package(Qt6 REQUIRED COMPONENTS Quick)
 
@@ -29,6 +30,9 @@ qt_add_qml_module(apphmon
     SOURCES headers/datamanager.hpp
 )
 
+add_library(procdata STATIC src/procdatasource.cpp)
+add_library(dataman STATIC src/datamanager.cpp)
+
 # Qt for iOS sets MACOSX_BUNDLE_GUI_IDENTIFIER automatically since Qt 6.1.
 # If you are developing for iOS or macOS you should consider setting an
 # explicit, fixed bundle identifier manually though.
@@ -43,15 +47,12 @@ set_target_properties(apphmon PROPERTIES
 target_link_libraries(apphmon
     PRIVATE Qt6::Quick
     lfreist-hwinfo::hwinfo
+    procdata
+    dataman
 )
 
 target_include_directories(apphmon
     PUBLIC ./headers
-)
-
-target_sources(apphmon
-    PRIVATE src/datamanager.cpp
-    src/procdatasource.cpp
 )
 
 include(GNUInstallDirs)

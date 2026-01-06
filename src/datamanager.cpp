@@ -1,8 +1,8 @@
 #include "datamanager.hpp"
 
 DataManager::DataManager(QObject *parent): QObject{parent} {
-    this->update();
-    this->m_MemTotal = hwinfo::Memory().total_Bytes();
+    update();
+    m_MemTotal = hwinfo::Memory().total_Bytes();
 }
 
 DataManager::DataManager(): DataManager(nullptr) {}
@@ -12,9 +12,7 @@ void DataManager::update() {
 
     const hwinfo::Memory mem;
     m_MemUsed = m_MemTotal - mem.available_Bytes();
-
-    // TODO
-    m_MemProc = 1024;
+    m_MemProc = dataSource.getFgProcessMemory();
 }
 
 QString DataManager::MemTotal_Qt() const {

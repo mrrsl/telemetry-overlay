@@ -16,6 +16,9 @@ Ideally, avoid export of any OS-specific types and only return standard types to
 
 #include <QString>
 
+#include <vector>
+#include <ranges>
+
 #pragma comment(lib, "wbemuuid.lib")
 
 class ProcData {
@@ -39,6 +42,8 @@ class ProcData {
 
     /** Returns the sum of two `FILETIME` structures as a 128 bit integer. */
     static unsigned long long filetimeSum(FILETIME, FILETIME);
+
+    std::vector<WCHAR> getFgGpuPath();
 public:
     /** Sets up program to make necessary WMI calls. Check */
     ProcData();
@@ -73,6 +78,12 @@ public:
      * @return Empty string if the call to `QueryFullProcessImageName` fails.
      */
     QString getFgProcessName();
+
+    /**
+     * Get the percent utilization of the GPU by the current foreground process.
+     * @return Number in the range `[0, 1)`.
+     */
+    double getFgProcessGpuUsage();
 };
 
 #endif

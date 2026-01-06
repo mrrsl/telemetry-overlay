@@ -5,6 +5,8 @@
 
 #include <array>
 
+#include <Pdh.h>
+
 ProcData::ProcData() {
     pLocate = NULL;
     pServ = NULL;
@@ -142,4 +144,40 @@ QString ProcData::getFgProcessName() {
     } else {
         return QString("");
     }
+}
+
+std::vector<WCHAR> ProcData::getFgGpuPath() {
+    using std::vector;
+
+    DWORD counterSz, instanceSz;
+    PdhEnumObjectItemsW(
+        NULL,
+        NULL,
+        L"GPU Engine",
+        NULL,
+        &counterSz,
+        NULL,
+        &instanceSz,
+        PERF_DETAIL_WIZARD,
+        0
+    );
+    auto instanceString = vector<WCHAR>(instanceSz);
+    PdhEnumObjectItemsW(
+        NULL,
+        NULL,
+        L"GPU Engine",
+        NULL,
+        &counterSz,
+        instanceString.data(),
+        &instanceSz,
+        PERF_DETAIL_WIZARD,
+        0
+    );
+
+    // TODO
+}
+
+double ProcData::getFgProcessGpuUsage() {
+    getFgProcHandle();
+
 }

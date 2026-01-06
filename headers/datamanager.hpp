@@ -6,15 +6,20 @@
 
 #include "hwinfo/hwinfo.h"
 
+#include "procdatasource.hpp"
+
 class DataManager: public QObject {
     Q_OBJECT
 
     Q_PROPERTY(QString MemTotal READ MemTotal_Qt)
-    Q_PROPERTY(QString MemUsed READ MemUsed_Qt)
-    Q_PROPERTY(QString MemProc READ MemProc_Qt)
+    Q_PROPERTY(QString MemUsed READ MemUsed_Qt NOTIFY notifyMemUsed)
+    Q_PROPERTY(QString MemProc READ MemProc_Qt NOTIFY notifyMemProc)
 
     /** Default refresh interval for telemetry. */
     static constexpr unsigned DEFAULT_INTERVAL_MS = 250;
+
+    /** Interface for OS APIs. */
+    ProcData dataSource;
 
     /** Refresh interval. */
     unsigned m_interval;
