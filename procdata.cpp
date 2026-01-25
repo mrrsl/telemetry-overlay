@@ -66,12 +66,16 @@ bool ProcData::initSuccessful() const {
 HANDLE ProcData::getFgProcHandle() {
     HWND hForeground = GetForegroundWindow();
     DWORD procId = GetWindowThreadProcessId(hForeground, NULL);
+
     if (procId == 0)
         return NULL;
+
     if (procId == lastProc)
         return lastProcHandle;
+
     if (lastProcHandle != NULL)
         CloseHandle(lastProcHandle);
+
     lastProc = procId;
     lastProcHandle = OpenProcess(PROCESS_QUERY_INFORMATION, FALSE, procId);
     return lastProcHandle;

@@ -13,6 +13,9 @@ void DataManager::update() {
     const hwinfo::Memory mem;
     m_MemUsed = m_MemTotal - mem.available_Bytes();
     m_MemProc = dataSource.getFgProcessMemory();
+
+    emit notifyMemUsed(m_MemUsed);
+    emit notifyMemProc(m_MemProc);
 }
 
 QString DataManager::MemTotal_Qt() const {

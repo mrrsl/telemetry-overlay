@@ -46,6 +46,10 @@ public:
     QString MemTotal_Qt() const;
     QString MemUsed_Qt() const;
     QString MemProc_Qt() const;
+
+signals:
+    void notifyMemUsed(int updatedMemUsed);
+    void notifyMemProc(int updatedMemProc);
 };
 
 #endif // DATAMANAGER_H
