@@ -41,12 +41,12 @@ jobs:
 
     - name: Ship
       run: | 
-        $app_binary = ${{github.workspace}}/build/Desktop_Qt_6_10_1_MSVC2022_64bit-Release/apphw_overlay.exe
+        $app_binary = "${{github.workspace}}/build/Release/apphw_overlay.exe"
         windeployqt --qmldir .$app_binary
       
     - name: Upload
       uses: actions/upload-artifact@v4
       with:
         name: windows-application-deployed
-        path: ${{github.workspace}}/build/Desktop_Qt_6_10_1_MSVC2022_64bit-Release/
+        path: ${{github.workspace}}/build/Release/
         
