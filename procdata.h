@@ -37,23 +37,7 @@ class ProcData {
     /** Handle to the process identified by `lastProc`. */
     HANDLE lastProcHandle;
 
-    /** Gets the handle for the process that created the current foreground window. */
-    HANDLE getFgProcHandle();
-
-    static unsigned long long filetimeSum(FILETIME, FILETIME);
-
-    static long long filetimeDiff(FILETIME, FILETIME);
-
-    /** Retrieves the engtype_3D instances from a large double-null separated string. */
-    std::vector<WCHAR> parseGpuCounterPaths(std::vector<WCHAR> &instanceList);
-
-    static bool instanceHasPid(DWORD pid, std::vector<WCHAR>::iterator beg, std::vector<WCHAR>::iterator end);
-
-    static bool correctInstanceType(std::vector<WCHAR>::iterator beg, std::vector<WCHAR>::iterator end);
-
-    std::vector<WCHAR> getFgGpuPath();
-
-    static bool procHandleValid(HANDLE);
+    
 public:
     /** Sets up program to make necessary WMI calls. Avoid creating more than one COM Object */
     ProcData();
@@ -61,6 +45,30 @@ public:
     /** Release COM resources here. */
     ~ProcData();
 
+    /** Gets the handle for the process that created the current foreground window. */
+    HANDLE getFgProcHandle();
+
+    /** Sum two 'FILETIME's into a single integral type. */
+    static unsigned long long filetimeSum(FILETIME, FILETIME);
+
+    /** Gets the relative difference between two `FILETIME`s */
+    static long long filetimeDiff(FILETIME, FILETIME);
+
+    /** Retrieves the engtype_3D instances from a large double-null separated string. */
+    std::vector<WCHAR> parseGpuCounterPaths(std::vector<WCHAR> &instanceList);
+
+    /** Check if a GPU instance path has the given PID. */
+    static bool instanceHasPid(DWORD pid, std::vector<WCHAR>::iterator beg, std::vector<WCHAR>::iterator end);
+
+    /** Check if an instance path has the correct one for GPU 3D utilization. */
+    static bool correctInstanceType(std::vector<WCHAR>::iterator beg, std::vector<WCHAR>::iterator end);
+
+    /** Get the instance path for the foreground process. */
+    std::vector<WCHAR> getFgGpuPath();
+
+    /** Check that the process handle hasn't timed out. */
+    static bool procHandleValid(HANDLE);
+    
     /**
      * Checks whether the instance was initialized successfully.
      * @return Returns true if no error codes were returned in the constructor.

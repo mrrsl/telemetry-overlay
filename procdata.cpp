@@ -1,4 +1,5 @@
 #include "procdata.h"
+#include <winbase.h>
 #include <winnt.h>
 
 ProcData::ProcData() {
@@ -150,13 +151,16 @@ QString ProcData::getFgProcessName() {
     using std::array;
     constexpr unsigned long nameBufferSize = 256;
     const QRegularExpression pathEndRegexp(R"([\\^].+?$)");
+    HANDLE fgHandle = getFgProcHandle();
 
-    getFgProcHandle();
-    auto titleBuffer = array<WCHAR, nameBufferSize>();
-    HWND fgWindow = GetForegroundWindow();
-    GetWindowText(fgWindow, titleBuffer.data(), nameBufferSize);
+    if (fgHandle == NULL)
+        return QString("");
 
-    QString title = QString::fromWCharArray(titleBuffer.data());
+    DWORD written_size = nameBufferSize;
+    WCHAR titleBuffer[nameBufferSize];
+    QueryFullProcessImageName(fgHandle, 0, titleBuffer, &written_size);
+
+    QString title = QString::fromWCharArray(titleBuffer);
     QRegularExpressionMatch matches = pathEndRegexp.match(title);
 
     if (matches.hasMatch()) {
@@ -259,5 +263,6 @@ std::vector<WCHAR> ProcData::getFgGpuPath() {
 
 double ProcData::getFgProcessGpuUsage() {
     getFgProcHandle();
+    std::vector<WCHAR> gpuPath = getFgGpuPath();
     return 0.0;
 }

@@ -110,6 +110,7 @@ target_link_libraries(test_errors
     Qt6::Quick
     Qt6::Graphs
     procdata
+    datamanager
 )
 target_compile_options(test_errors
     PUBLIC
