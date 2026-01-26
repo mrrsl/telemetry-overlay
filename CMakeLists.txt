@@ -6,7 +6,12 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
 include(FetchContent)
 
-find_package(Qt6 REQUIRED COMPONENTS Quick)
+find_package(Qt6
+    COMPONENTS
+        Quick
+        Graphs
+    REQUIRED
+)
 
 qt_standard_project_setup(REQUIRES 6.8)
 
@@ -53,6 +58,7 @@ qt_add_qml_module(apphw_overlay
     URI hw_overlay
     QML_FILES
         Main.qml
+        MemoryUsage.qml
     SOURCES
         main.cpp
         datamanager.h
@@ -72,7 +78,7 @@ set_target_properties(apphw_overlay PROPERTIES
 target_link_libraries(apphw_overlay
     PRIVATE
         Qt6::Quick
-    PUBLIC
+        Qt6::Graphs
         lfreist-hwinfo::hwinfo
         procdata
         datamanager
@@ -95,7 +101,7 @@ target_link_libraries(test_errors
     GTest::gtest_main
     GTest::gmock
     Qt6::Quick
-
+    Qt6::Graphs
     procdata
 )
 target_compile_options(test_errors

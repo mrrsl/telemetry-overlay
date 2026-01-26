@@ -35,3 +35,9 @@ TEST(PROCESS_CHECKS, CheckFgProcMemory) {
     auto fg_proc_mem = DataInits::data_source.getFgProcessMemory();
     EXPECT_GT(fg_proc_mem, 0);
 }
+
+// Strictly making sure this doesn't error out since it makes several c-api calls
+TEST(PROCESS_CHECKS, CheckGpuPaths) {
+    double gpu_utilization = DataInits::data_source.getFgProcessGpuUsage();
+    ASSERT_TRUE(true);
+}

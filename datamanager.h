@@ -1,18 +1,26 @@
 #ifndef DATAMANAGER_H
 #define DATAMANAGER_H
 
+#include <thread>
+
 #include <QObject>
 #include <QString>
 
 #include "hwinfo/hwinfo.h"
-
 #include "procdata.h"
 
+/**
+ * Preferred interface for accessing hardware utilization metrics.
+ */
 class DataManager: public QObject {
     Q_OBJECT
 
-    /** Default refresh interval for telemetry. */
     static constexpr unsigned DEFAULT_INTERVAL_MS = 250;
+    static constexpr unsigned MAXIMUM_HISTORIC_INTERVAL_MS = 60 * 1000;
+    // with 4 billion KB capping out at ~4000 GB we should be okay
+    static constexpr long long KB_DIVISOR = 0b10 << 10;
+
+    static const QString PERCENT_POSTFIX;
 
     /** Interface for OS APIs. */
     ProcData dataSource;
@@ -32,24 +40,40 @@ class DataManager: public QObject {
     /** Thread-UNSAFE container of CPU state. */
     std::vector<hwinfo::CPU> m_cpus;
 
+    std::thread update_thread;
+    
+    bool exit_requested;
+
     /** Refresh function. */
     void update();
 
+    void update_loop();
+
 public:
-    Q_PROPERTY(QString MemTotal READ MemTotal_Qt)
-    Q_PROPERTY(QString MemUsed READ MemUsed_Qt NOTIFY notifyMemUsed)
-    Q_PROPERTY(QString MemProc READ MemProc_Qt NOTIFY notifyMemProc)
+    Q_PROPERTY(unsigned RefreshIntervalMs READ RefreshIntervalMs)
+    Q_PROPERTY(unsigned MemTotalKb READ MemTotalKb)
+    Q_PROPERTY(unsigned MemUsedKb READ MemUsedKb NOTIFY notifyMemUsedKb)
+    Q_PROPERTY(unsigned MemProcKb READ MemProcKb NOTIFY notifyMemProcKb)
+    Q_PROPERTY(double CpuTotalUse READ CpuTotal NOTIFY notifyCpuTotal)
+    Q_PROPERTY(double CpuProcUse READ CpuProcUse NOTIFY notifyCpuProcUse)
 
     explicit DataManager(QObject*);
     explicit DataManager();
 
-    QString MemTotal_Qt() const;
-    QString MemUsed_Qt() const;
-    QString MemProc_Qt() const;
+    unsigned MemTotalKb() const;
+    unsigned MemUsedKb() const;
+    unsigned MemProcKb() const;
+
+    double CpuTotal();
+    double CpuProcUse();
+
+    unsigned RefreshIntervalMs() const;
 
 signals:
-    void notifyMemUsed(int updatedMemUsed);
-    void notifyMemProc(int updatedMemProc);
+    void notifyMemUsedKb();
+    void notifyMemProcKb();
+    void notifyCpuTotal();
+    void notifyCpuProcUse();
 };
 
 #endif // DATAMANAGER_H
