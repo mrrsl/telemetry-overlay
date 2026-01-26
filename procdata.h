@@ -20,7 +20,7 @@
 class ProcData {
 
     /**  */
-    static constexpr int MICROSEC_TO_FILETIME =  10000;
+    static constexpr int MICROSEC_TO_FILETIME =  10;
 
     /** Set to true if there were no errors during initialization. */
     bool initSuccess;

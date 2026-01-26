@@ -5,7 +5,7 @@ const QString DataManager::PERCENT_POSTFIX = QString::fromUtf8(" %");
 
 DataManager::DataManager(QObject *parent):
     QObject{parent},
-    dataSource{}
+    data_source{}
 {
     m_interval = DEFAULT_INTERVAL_MS;
     m_cpus = hwinfo::getAllCPUs();
@@ -22,7 +22,7 @@ DataManager::DataManager(QObject *parent):
     exit_requested = false;
 
     update();
-    update_thread = std::thread(&DataManager::update_loop, this);
+    update_thread = std::thread(&DataManager::updateLoop, this);
 }
 
 DataManager::DataManager(): DataManager(nullptr) {}
@@ -31,8 +31,8 @@ void DataManager::update() {
 
     const hwinfo::Memory mem;
     m_MemUsed = m_MemTotal - mem.available_Bytes();
-    m_MemProc = dataSource.getFgProcessMemory();
-    sample_cpu_times();
+    m_MemProc = data_source.getFgProcessMemory();
+    sampleCpuTimes();
     
     emit notifyMemUsedKb();
     emit notifyMemProcKb();
@@ -43,10 +43,10 @@ void DataManager::update() {
 DataManager::~DataManager() {
     exit_requested = true;
     update_thread.join();
-    dataSource.~ProcData();
+    data_source.~ProcData();
 }
 
-void DataManager::update_loop() {
+void DataManager::updateLoop() {
 
     while (!exit_requested) {
         update();
@@ -66,11 +66,11 @@ unsigned DataManager::MemProcKb() const {
     return m_MemProc / DataManager::KB_DIVISOR;
 }
 
-void DataManager::sample_cpu_times() {
+void DataManager::sampleCpuTimes() {
 
     double core_time_div = static_cast<double>(core_time_interval);
-    unsigned long long total_cpu_time = dataSource.getTotalCpuTime();
-    unsigned long long total_proc_time = dataSource.getTotalProcessTime();
+    unsigned long long total_cpu_time = data_source.getTotalCpuTime();
+    unsigned long long total_proc_time = data_source.getTotalProcessTime();
     unsigned long long cpu_diff = 0;
     unsigned long long proc_diff = 0;
 
@@ -86,9 +86,12 @@ void DataManager::sample_cpu_times() {
     } else {
         proc_diff = total_proc_time - last_proc_measurement;
         // Account for changing foreground process;
-        if (proc_diff < 0) proc_diff = 0;
-
+        if (proc_diff < 0)
+            proc_diff = 0;
         calculated_proc_use = proc_diff / static_cast<double>(cpu_diff);
+
+        if (calculated_proc_use > 1.0)
+            calculated_proc_use = 1.0;
     }
 
     last_cpu_measurement = total_cpu_time;

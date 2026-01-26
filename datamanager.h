@@ -25,7 +25,7 @@ class DataManager: public QObject {
     static const QString PERCENT_POSTFIX;
 
     /** Interface for OS APIs. */
-    ProcData dataSource;
+    ProcData data_source;
 
     /** Refresh interval. */
     unsigned m_interval;
@@ -59,9 +59,9 @@ class DataManager: public QObject {
     /** Refresh function. */
     void update();
 
-    void update_loop();
+    void updateLoop();
 
-    void sample_cpu_times();
+    void sampleCpuTimes();
 
 public:
     Q_PROPERTY(unsigned RefreshIntervalMs READ RefreshIntervalMs)
