@@ -57,13 +57,15 @@ qt_add_executable(apphw_overlay
 qt_add_qml_module(apphw_overlay
     URI hw_overlay
     QML_FILES
-        Main.qml
-        MemoryUsage.qml
-        CpuUsage.qml
-        GraphHeading.qml
+        qml/Main.qml
+        qml/MemoryUsage.qml
+        qml/CpuUsage.qml
+        qml/GraphHeading.qml
+
     SOURCES
         main.cpp
         datamanager.h
+        QML_FILES qml/CommonGraph.qml
 )
 
 # Qt for iOS sets MACOSX_BUNDLE_GUI_IDENTIFIER automatically since Qt 6.1.

@@ -102,7 +102,7 @@ Window {
         AreaSeries {
             id: fg_mem_series
 
-            color: fg_mem_series.dirty_green
+            color: fg_mem.dirty_green
 
             upperSeries: LineSeries {
                 id: fg_mem_line
@@ -146,12 +146,12 @@ Window {
                     target: data_manager
                     function onNotifyCpuTotal() {
 
-                        updateArrayXValues(cpu_usage_history);
-                        turnoverArray(cpu_usage_history, cpu_usage.default_window_ms);
+                        updateArrayXValues(cpu_used_history);
+                        turnoverArray(cpu_used_history, cpu_usage.default_window_ms);
 
                         let data_entry = data_manager.CpuTotalUse * 100;
-                        cpu_usage_history.push({x: 0, y: data_entry, timestamp_ms: main_window.now_ms});
-                        cpu_usage_line.replace(cpu_usage_history);
+                        cpu_used_history.push({x: 0, y: data_entry, timestamp_ms: main_window.now_ms});
+                        cpu_usage_line.replace(cpu_used_history);
                     }
                 }
             }
@@ -178,7 +178,7 @@ Window {
 
                 Connections {
                     target: data_manager
-                    function onNotifyCpuProc() {
+                    function onNotifyCpuProcUse() {
 
                         updateArrayXValues(cpu_proc_history);
                         turnoverArray(cpu_proc_history, cpu_proc.default_window_ms);

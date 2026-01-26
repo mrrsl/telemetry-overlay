@@ -1,5 +1,5 @@
 #include "datamanager.h"
-#include <chrono>
+
 
 const QString DataManager::PERCENT_POSTFIX = QString::fromUtf8(" %");
 
@@ -7,10 +7,21 @@ DataManager::DataManager(QObject *parent):
     QObject{parent},
     dataSource{}
 {
-    update();
-    exit_requested = false;
     m_interval = DEFAULT_INTERVAL_MS;
+    m_cpus = hwinfo::getAllCPUs();
     m_MemTotal = hwinfo::Memory().total_Bytes();
+
+    last_cpu_measurement = -1;
+    last_proc_measurement = -1;
+    calculated_use = 0.0;
+    calculated_proc_use = 0.0;
+
+    core_time_interval = m_interval *
+        MILI_TO_MICROSEC *
+        m_cpus[0].numLogicalCores();
+    exit_requested = false;
+
+    update();
     update_thread = std::thread(&DataManager::update_loop, this);
 }
 
@@ -18,13 +29,11 @@ DataManager::DataManager(): DataManager(nullptr) {}
 
 void DataManager::update() {
 
-    m_cpus = hwinfo::getAllCPUs();
-
     const hwinfo::Memory mem;
     m_MemUsed = m_MemTotal - mem.available_Bytes();
     m_MemProc = dataSource.getFgProcessMemory();
+    sample_cpu_times();
     
-
     emit notifyMemUsedKb();
     emit notifyMemProcKb();
     emit notifyCpuTotal();
@@ -57,21 +66,41 @@ unsigned DataManager::MemProcKb() const {
     return m_MemProc / DataManager::KB_DIVISOR;
 }
 
+void DataManager::sample_cpu_times() {
+
+    double core_time_div = static_cast<double>(core_time_interval);
+    unsigned long long total_cpu_time = dataSource.getTotalCpuTime();
+    unsigned long long total_proc_time = dataSource.getTotalProcessTime();
+    unsigned long long cpu_diff = 0;
+    unsigned long long proc_diff = 0;
+
+    if (last_cpu_measurement < 0) {
+        calculated_use = 0.0;
+    } else {
+        cpu_diff = total_cpu_time - last_cpu_measurement;
+        calculated_use = cpu_diff / core_time_div;
+    }
+
+    if (last_proc_measurement < 0) {
+        calculated_proc_use = 0.0;
+    } else {
+        proc_diff = total_proc_time - last_proc_measurement;
+        // Account for changing foreground process;
+        if (proc_diff < 0) proc_diff = 0;
+
+        calculated_proc_use = proc_diff / static_cast<double>(cpu_diff);
+    }
+
+    last_cpu_measurement = total_cpu_time;
+    last_proc_measurement = total_proc_time;
+}
+
 double DataManager::CpuProcUse() {
-    unsigned long long total_time = dataSource.getTotalCpuTime();
-    unsigned long long fg_proc_time = dataSource.getTotalProcessTime();
-    
-    double time_fraction = static_cast<double>(fg_proc_time) / total_time;
-
-
-    return time_fraction;
+    return calculated_proc_use;
 }
 
 double DataManager::CpuTotal() {
-    auto total_utilization = m_cpus[0].currentUtilisation();
-    total_utilization *= 100;
-    
-    return total_utilization;
+    return calculated_use;
 }
 
 unsigned DataManager::RefreshIntervalMs() const {

@@ -2,6 +2,7 @@
 #define DATAMANAGER_H
 
 #include <thread>
+#include <chrono>
 
 #include <QObject>
 #include <QString>
@@ -15,8 +16,9 @@
 class DataManager: public QObject {
     Q_OBJECT
 
-    static constexpr unsigned DEFAULT_INTERVAL_MS = 250;
-    static constexpr unsigned MAXIMUM_HISTORIC_INTERVAL_MS = 60 * 1000;
+    static constexpr int DEFAULT_INTERVAL_MS = 250;
+    static constexpr int MILI_TO_MICROSEC = 1000;
+
     // with 4 billion KB capping out at ~4000 GB we should be okay
     static constexpr long long KB_DIVISOR = 0b10 << 10;
 
@@ -44,10 +46,22 @@ class DataManager: public QObject {
 
     bool exit_requested;
 
+    unsigned long long last_cpu_measurement;
+
+    unsigned long long last_proc_measurement;
+
+    unsigned long long core_time_interval;
+
+    double calculated_use;
+
+    double calculated_proc_use;
+
     /** Refresh function. */
     void update();
 
     void update_loop();
+
+    void sample_cpu_times();
 
 public:
     Q_PROPERTY(unsigned RefreshIntervalMs READ RefreshIntervalMs)
@@ -65,7 +79,9 @@ public:
     unsigned MemUsedKb() const;
     unsigned MemProcKb() const;
 
+    /** Return total CPU utilization. */
     double CpuTotal();
+    /** CPU utilization by the current foreground process. */
     double CpuProcUse();
 
     unsigned RefreshIntervalMs() const;

@@ -93,29 +93,50 @@ unsigned long long ProcData::filetimeSum(FILETIME ft0, FILETIME ft1) {
     return a0.QuadPart + a1.QuadPart;
 }
 
+long long ProcData::filetimeDiff(FILETIME ft0, FILETIME ft1) {
+    ULARGE_INTEGER a0, a1;
+    a0.HighPart = ft0.dwHighDateTime;
+    a0.LowPart = ft0.dwLowDateTime;
+    a1.HighPart = ft1.dwHighDateTime;
+    a1.LowPart = ft1.dwLowDateTime;
+
+    return a0.QuadPart - a1.QuadPart;
+}
+
 unsigned long long ProcData::getTotalProcessTime() {
     HANDLE hProc = getFgProcHandle();
     if (hProc == NULL)
         return ~0x0u;
 
-    FILETIME scratchFt;
-    FILETIME kTime;
-    FILETIME uTime;
-    GetProcessTimes(hProc, &scratchFt, &scratchFt, &kTime, &uTime);
+    FILETIME scratch_time;
+    FILETIME kernel_time;
+    FILETIME user_time;
+    GetProcessTimes(hProc, &scratch_time, &scratch_time, &kernel_time, &user_time);
 
-    return ProcData::filetimeSum(kTime, uTime);
+    unsigned long long time_spent = ProcData::filetimeSum(kernel_time, user_time);
+
+    return time_spent / MICROSEC_TO_FILETIME;
 }
 
 unsigned long long ProcData::getTotalCpuTime() {
-    FILETIME iTime, kTime, uTime;
-    GetSystemTimes(&iTime, &kTime, &uTime);
+    FILETIME i_file_time, k_file_time, u_file_time;
+    GetSystemTimes(&i_file_time, &k_file_time, &u_file_time);
 
-    return ProcData::filetimeSum(kTime, uTime);
+    ULARGE_INTEGER itime_int;
+    itime_int.HighPart = i_file_time.dwHighDateTime;
+    itime_int.LowPart = i_file_time.dwLowDateTime;
+
+    // Remember this is number of 100ns intervals
+    unsigned long long idle_in_kernel = itime_int.QuadPart;
+    unsigned long long time_spent = ProcData::filetimeSum(k_file_time, u_file_time);
+
+    return (time_spent - idle_in_kernel) / MICROSEC_TO_FILETIME;
 }
 
 unsigned long long ProcData::getFgProcessMemory() {
     HANDLE hProc = getFgProcHandle();
     PROCESS_MEMORY_COUNTERS pc;
+
     if (hProc == NULL)
         return 0;
 

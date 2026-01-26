@@ -18,6 +18,10 @@
 #pragma comment(lib, "wbemuuid.lib")
 
 class ProcData {
+
+    /**  */
+    static constexpr int MICROSEC_TO_FILETIME =  10000;
+
     /** Set to true if there were no errors during initialization. */
     bool initSuccess;
 
@@ -36,8 +40,9 @@ class ProcData {
     /** Gets the handle for the process that created the current foreground window. */
     HANDLE getFgProcHandle();
 
-    /** Returns the sum of two `FILETIME` structures as a 128 bit integer. */
     static unsigned long long filetimeSum(FILETIME, FILETIME);
+
+    static long long filetimeDiff(FILETIME, FILETIME);
 
     /** Retrieves the engtype_3D instances from a large double-null separated string. */
     std::vector<WCHAR> parseGpuCounterPaths(std::vector<WCHAR> &instanceList);
@@ -48,7 +53,7 @@ class ProcData {
 
     std::vector<WCHAR> getFgGpuPath();
 
-    static bool procHandleValid(HANDLE procHandle);
+    static bool procHandleValid(HANDLE);
 public:
     /** Sets up program to make necessary WMI calls. Avoid creating more than one COM Object */
     ProcData();
@@ -63,12 +68,12 @@ public:
     bool initSuccessful() const;
 
     /**
-     * Gets the total amount of user and kernel time spent by the foreground process.
+     * Gets the total amount of user and kernel time (micro-seconds) spent by the foreground process.
      */
     unsigned long long getTotalProcessTime();
 
     /**
-     * Get the total amount of time spent by the CPU in kernel and user mode.
+     * Get the total amount of time (microseconds) spent by the CPU in kernel and user mode.
      */
     unsigned long long getTotalCpuTime();
 
