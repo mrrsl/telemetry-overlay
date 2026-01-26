@@ -47,6 +47,8 @@ class ProcData {
     static bool correctInstanceType(std::vector<WCHAR>::iterator beg, std::vector<WCHAR>::iterator end);
 
     std::vector<WCHAR> getFgGpuPath();
+
+    static bool procHandleValid(HANDLE procHandle);
 public:
     /** Sets up program to make necessary WMI calls. Avoid creating more than one COM Object */
     ProcData();

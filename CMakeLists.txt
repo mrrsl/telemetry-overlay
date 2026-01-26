@@ -59,6 +59,8 @@ qt_add_qml_module(apphw_overlay
     QML_FILES
         Main.qml
         MemoryUsage.qml
+        CpuUsage.qml
+        GraphHeading.qml
     SOURCES
         main.cpp
         datamanager.h

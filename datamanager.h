@@ -41,7 +41,7 @@ class DataManager: public QObject {
     std::vector<hwinfo::CPU> m_cpus;
 
     std::thread update_thread;
-    
+
     bool exit_requested;
 
     /** Refresh function. */
@@ -59,6 +59,7 @@ public:
 
     explicit DataManager(QObject*);
     explicit DataManager();
+    ~DataManager();
 
     unsigned MemTotalKb() const;
     unsigned MemUsedKb() const;

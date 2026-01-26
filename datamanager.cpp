@@ -5,14 +5,13 @@ const QString DataManager::PERCENT_POSTFIX = QString::fromUtf8(" %");
 
 DataManager::DataManager(QObject *parent):
     QObject{parent},
-    dataSource{},
-    update_thread{&DataManager::update_loop, this} {
-
+    dataSource{}
+{
     update();
-
     exit_requested = false;
     m_interval = DEFAULT_INTERVAL_MS;
     m_MemTotal = hwinfo::Memory().total_Bytes();
+    update_thread = std::thread(&DataManager::update_loop, this);
 }
 
 DataManager::DataManager(): DataManager(nullptr) {}
@@ -30,6 +29,12 @@ void DataManager::update() {
     emit notifyMemProcKb();
     emit notifyCpuTotal();
     emit notifyCpuProcUse();
+}
+
+DataManager::~DataManager() {
+    exit_requested = true;
+    update_thread.join();
+    dataSource.~ProcData();
 }
 
 void DataManager::update_loop() {
@@ -71,4 +76,9 @@ double DataManager::CpuTotal() {
 
 unsigned DataManager::RefreshIntervalMs() const {
     return DataManager::m_interval;
+}
+
+bool ProcData::procHandleValid(HANDLE procHandle) {
+    DWORD handleStatus = WaitForSingleObject(procHandle, 0);
+    return handleStatus == WAIT_TIMEOUT;
 }

@@ -1,4 +1,5 @@
 #include "procdata.h"
+#include <winnt.h>
 
 ProcData::ProcData() {
     pLocate = NULL;
@@ -65,19 +66,20 @@ bool ProcData::initSuccessful() const {
 
 HANDLE ProcData::getFgProcHandle() {
     HWND hForeground = GetForegroundWindow();
-    DWORD procId = GetWindowThreadProcessId(hForeground, NULL);
+    DWORD procId;
+    DWORD procThreadId = GetWindowThreadProcessId(hForeground, &procId);
 
     if (procId == 0)
         return NULL;
 
-    if (procId == lastProc)
+    if (procId == lastProc && lastProcHandle != NULL)
         return lastProcHandle;
 
     if (lastProcHandle != NULL)
         CloseHandle(lastProcHandle);
 
     lastProc = procId;
-    lastProcHandle = OpenProcess(PROCESS_QUERY_INFORMATION, FALSE, procId);
+    lastProcHandle = OpenProcess(PROCESS_QUERY_LIMITED_INFORMATION, TRUE, procId);
     return lastProcHandle;
 }
 
@@ -114,7 +116,7 @@ unsigned long long ProcData::getTotalCpuTime() {
 unsigned long long ProcData::getFgProcessMemory() {
     HANDLE hProc = getFgProcHandle();
     PROCESS_MEMORY_COUNTERS pc;
-    if (lastProcHandle == NULL)
+    if (hProc == NULL)
         return 0;
 
     BOOL queryRes = GetProcessMemoryInfo(hProc, &pc, sizeof(pc));

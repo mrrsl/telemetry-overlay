@@ -3,24 +3,17 @@ import QtGraphs
 
 GraphsView {
     property int default_height: 150
-    property string main_color: "#00000090"
-    property string sec_color: "#00002090"
-    property string mint_green: "#38E4AE"
-    property string emerald_green: "#7BD389"
-    property string celadon_green: "#AEDCC0"
-    property string dirty_green: "#607466"
-    property string dark_green: "#343E3D"
+    property string total_usage_color: "#A1CDF1"
+    property string proc_usage_color: "#8EEDF7"
 
     property int default_window_ms: -60 * 1000
 
     width: parent.width
-    height: default_height
-
     marginLeft: 10
     marginRight: 10
 
     theme: GraphsTheme {
-        colorScheme: GraphsTheme.ColorScheme.Dark
+        colorScheme: GraphsTheme.ColorSchemes.Automatic
         backgroundVisible: false
         plotAreaBackgroundVisible: false
         labelBackgroundVisible: false
@@ -29,16 +22,17 @@ GraphsView {
     axisX: ValueAxis {
         min: default_window_ms
         max: 0
+        tickInterval: (default_window_ms * -1) / 4
         gridVisible: false
         subGridVisible: false
-        tickInterval: (default_window_ms * -1) / 4
         labelsVisible: false
     }
+
     axisY: ValueAxis {
         min: 0
         max: 100
+        tickInterval: 100
         gridVisible: false
         subGridVisible: false
-        tickInterval: 100
     }
 }
