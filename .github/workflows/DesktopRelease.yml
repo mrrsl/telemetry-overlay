@@ -23,6 +23,7 @@ jobs:
         target: 'desktop'
         arch: 'win64_msvc2022_64'
         modules: 'qtquick3d qtgraphs qtshadertools'
+        cache: true
 
     - name: Configure CMake
       # `CMAKE_BUILD_TYPE` is only required if you are using a single-configuration generator such as make.
