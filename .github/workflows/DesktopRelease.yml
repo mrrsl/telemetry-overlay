@@ -1,0 +1,50 @@
+name: CMake
+on:
+  pull_request:
+    branches: [ "main" ]
+
+env:
+  BUILD_TYPE: Release
+
+jobs:
+  build:
+    # Side-note: Convert to matrix later for potential Unix build
+    # https://docs.github.com/en/free-pro-team@latest/actions/learn-github-actions/managing-complex-workflows#using-a-build-matrix
+    runs-on: windows-latest
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v4
+
+    - name: Install Qt
+      uses: jurplel/install-qt-action@v4
+      with:
+        version: '6.10.1'
+        host: 'windows'
+        target: 'desktop'
+        arch: 'win64_msvc2022_64'
+
+    - name: Configure CMake
+      # `CMAKE_BUILD_TYPE` is only required if you are using a single-configuration generator such as make.
+      # https://cmake.org/cmake/help/latest/variable/CMAKE_BUILD_TYPE.html?highlight=cmake_build_type
+      run: cmake -B ${{github.workspace}}/build -DCMAKE_BUILD_TYPE=${{env.BUILD_TYPE}}
+
+    - name: Build
+      run: cmake --build ${{github.workspace}}/build --config ${{env.BUILD_TYPE}}
+
+    - name: Test
+      working-directory: ${{github.workspace}}/build
+      # Execute tests defined by the CMake configuration.
+      # See https://cmake.org/cmake/help/latest/manual/ctest.1.html for more detail
+      run: ctest -C ${{env.BUILD_TYPE}}
+
+    - name: Ship
+      run: | 
+        $app_binary = ${{github.workspace}}/build/Desktop_Qt_6_10_1_MSVC2022_64bit-Release/apphw_overlay.exe
+        windeployqt --qmldir .$app_binary
+      
+    - name: Upload
+      uses: actions/upload-artifact@v4
+      with:
+        name: windows-application-deployed
+        path: ${{github.workspace}}/build/Desktop_Qt_6_10_1_MSVC2022_64bit-Release/
+        

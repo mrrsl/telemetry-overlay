@@ -61,11 +61,10 @@ qt_add_qml_module(apphw_overlay
         qml/MemoryUsage.qml
         qml/CpuUsage.qml
         qml/GraphHeading.qml
-
+        qml/CommonGraph.qml
     SOURCES
         main.cpp
         datamanager.h
-        QML_FILES qml/CommonGraph.qml
 )
 
 # Qt for iOS sets MACOSX_BUNDLE_GUI_IDENTIFIER automatically since Qt 6.1.
@@ -87,6 +86,10 @@ target_link_libraries(apphw_overlay
         procdata
         datamanager
 
+)
+target_link_options(apphw_overlay
+    PRIVATE
+    "-static" "-Wl,--subsystem,windows"
 )
 
 include(GNUInstallDirs)
