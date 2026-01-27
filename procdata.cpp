@@ -8,7 +8,7 @@ ProcData::ProcData() {
 
     // Need to make deep copy since ConnectServer does not accept a const pointer
     LPWSTR resource_name = new WCHAR[strlen(WMI_RESOURCE_NAME) + 1];
-    strcopy(WMI_RESOURCE_NAME, resource_name);
+    strcpy(WMI_RESOURCE_NAME, resource_name);
 
     HRESULT hres = CoInitializeSecurity(
         NULL,
@@ -204,8 +204,8 @@ std::string ProcData::getFgProcessName() {
     if (fgHandle == NULL)
         return std::string("");
 
-    DWORD written_size = nameBufferSize;
-    WCHAR titleBuffer[nameBufferSize];
+    DWORD written_size = max_buffer_size;
+    WCHAR titleBuffer[max_buffer_size];
     QueryFullProcessImageName(fgHandle, 0, titleBuffer, &written_size);
     std::string process_name = getLastPathItem(titleBuffer, written_size);
 
