@@ -6,6 +6,10 @@ ProcData::ProcData() {
     lastProc = 0;
     lastProcHandle = NULL;
 
+    // Need to make deep copy since ConnectServer does not accept a const pointer
+    LPWSTR resource_name = new WCHAR[strlen(WMI_RESOURCE_NAME) + 1];
+    strcopy(WMI_RESOURCE_NAME, resource_name);
+
     HRESULT hres = CoInitializeSecurity(
         NULL,
         -1,
@@ -34,7 +38,7 @@ ProcData::ProcData() {
         return;
     }
     hres = pLocate->ConnectServer(
-        BSTR(WMI_RESOURCE_NAME),
+        BSTR(resource_name),
         NULL,
         NULL,
         0,
@@ -43,6 +47,8 @@ ProcData::ProcData() {
         0,
         &pServ
         );
+
+    delete resource_name;
     if (FAILED(hres)) {
         initSuccess = false;
         return;
@@ -102,7 +108,7 @@ long long ProcData::filetimeDiff(FILETIME ft0, FILETIME ft1) {
     return a0.QuadPart - a1.QuadPart;
 }
 
-std::wstring ProcData::getLastPathItem(LPWSTR path, DWORD size) {
+std::string ProcData::getLastPathItem(LPWSTR path, DWORD size) {
     /*
      * This function makes the following assumptions:
      * - path is null-terminated
