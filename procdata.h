@@ -10,6 +10,9 @@
 #include <Pdh.h>
 #include <winnt.h>
 
+#include <string>
+// For dealing with win32's raw character arrays
+#include <string.h>
 #include <vector>
 
 #pragma comment(lib, "wbemuuid.lib")
@@ -24,7 +27,7 @@ class ProcData {
     static constexpr int MICROSEC_TO_FILETIME =  10;
 
     /** Resource name to use for `IWebmLocator::ConnectServer`. */
-    static constexpr wchar_t* WMI_RESOURCE_NAME = L"ROOT\\CIMV2";
+    static constexpr wchar_t*  WMI_RESOURCE_NAME = L"ROOT\\CIMV2";
 
     /** Set to true if there were no errors during initialization. */
     bool initSuccess;
