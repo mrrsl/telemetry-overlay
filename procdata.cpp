@@ -1,7 +1,5 @@
 #include "procdata.h"
 
-LPWSTR ProcData::WMI_RESOURCE_NAME = L"ROOT\\CIMV2";
-
 ProcData::ProcData() {
     pLocate = NULL;
     pServ = NULL;
@@ -131,12 +129,12 @@ std::string ProcData::getLastPathItem(LPWSTR path, DWORD size) {
     int wchar_conversion_status = WideCharToMultiByte(
         CP_UTF8,
         0,
-        end_sentinel,
+        (LPCWCH) end_sentinel,
         -1,
         NULL,
         0,
         NULL,
-        NULl
+        NULL
     );
 
     std::string last_item{wchar_conversion_status, '\0'};
@@ -144,7 +142,7 @@ std::string ProcData::getLastPathItem(LPWSTR path, DWORD size) {
     WideCharToMultiByte(
         CP_UTF8,
         0,
-        end_sentinel,
+        (LPCWCH) end_sentinel,
         -1,
         last_item.data(),
         wchar_conversion_status,
