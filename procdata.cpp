@@ -1,6 +1,4 @@
 #include "procdata.h"
-#include <winbase.h>
-#include <winnt.h>
 
 ProcData::ProcData() {
     pLocate = NULL;
@@ -36,7 +34,7 @@ ProcData::ProcData() {
         return;
     }
     hres = pLocate->ConnectServer(
-        BSTR(L"ROOT\\CIMV2"),
+        BSTR(WMI_RESOURCE_NAME),
         NULL,
         NULL,
         0,
@@ -104,6 +102,51 @@ long long ProcData::filetimeDiff(FILETIME ft0, FILETIME ft1) {
     return a0.QuadPart - a1.QuadPart;
 }
 
+std::wstring ProcData::getLastPathItem(LPWSTR path, DWORD size) {
+    /*
+     * This function makes the following assumptions:
+     * - path is null-terminated
+     * - path uses the win32 format
+     * - LPWSTR and CHAR resolve to wchar_t* and wchar_t and thus can be used with std::wstring
+     */
+    LPWSTR end_sentinel = path + size;
+    LPWSTR start_sentinel = end_sentinel - 1;
+    bool found_item = false;
+
+
+    while (start_sentinel > path && !found_item) {
+        WCHAR ch = *start_sentinel;
+        if (ch == L'\\') {
+            found_item = true;
+        }
+    }
+    int wchar_conversion_status = WideCharToMultiByte(
+        CP_UTF8,
+        0,
+        end_sentinel,
+        -1,
+        NULL,
+        0,
+        NULL,
+        NULl
+    );
+
+    std::string last_item{wchar_conversion_status, '\0'};
+
+    WideCharToMultiByte(
+        CP_UTF8,
+        0,
+        end_sentinel,
+        -1,
+        last_item.data(),
+        wchar_conversion_status,
+        NULL,
+        NULL
+    );
+
+    return last_item;
+}
+
 unsigned long long ProcData::getTotalProcessTime() {
     HANDLE hProc = getFgProcHandle();
     if (hProc == NULL)
@@ -147,27 +190,20 @@ unsigned long long ProcData::getFgProcessMemory() {
     else return 0;
 }
 
-QString ProcData::getFgProcessName() {
-    using std::array;
-    constexpr unsigned long nameBufferSize = 256;
-    const QRegularExpression pathEndRegexp(R"([\\^].+?$)");
+std::string ProcData::getFgProcessName() {
+    // QueryFullProcessImageName does not let us peek at the length of the process name before hand
+    constexpr unsigned max_buffer_size = 256;
     HANDLE fgHandle = getFgProcHandle();
 
     if (fgHandle == NULL)
-        return QString("");
+        return std::string("");
 
     DWORD written_size = nameBufferSize;
     WCHAR titleBuffer[nameBufferSize];
     QueryFullProcessImageName(fgHandle, 0, titleBuffer, &written_size);
+    std::string process_name = getLastPathItem(titleBuffer, written_size);
 
-    QString title = QString::fromWCharArray(titleBuffer);
-    QRegularExpressionMatch matches = pathEndRegexp.match(title);
-
-    if (matches.hasMatch()) {
-        return matches.captured(0);
-    } else {
-        return QString("");
-    }
+    return process_name;
 }
 
 bool ProcData::correctInstanceType(std::vector<WCHAR>::iterator beg, std::vector<WCHAR>::iterator end) {

@@ -8,19 +8,23 @@
 #include <Psapi.h>
 #include <WinBase.h>
 #include <Pdh.h>
-
-#include <QString>
-#include <QRegularExpression>
-#include <QRegularExpressionMatch>
+#include <winnt.h>
 
 #include <vector>
 
 #pragma comment(lib, "wbemuuid.lib")
 
+/**
+ * Interface for interacting with the OS API. Where possible, any implementation code should avoid
+ * using anything not defined in the Win32 API or the standard library.
+ */
 class ProcData {
 
-    /**  */
+    /** Reminder: the full quad-word stored in FILETIME represents the number of 100-nanosecond units. */
     static constexpr int MICROSEC_TO_FILETIME =  10;
+
+    /** Resource name to use for `IWebmLocator::ConnectServer`. */
+    static constexpr wchar_t* WMI_RESOURCE_NAME = L"ROOT\\CIMV2";
 
     /** Set to true if there were no errors during initialization. */
     bool initSuccess;
@@ -53,6 +57,9 @@ public:
 
     /** Gets the relative difference between two `FILETIME`s */
     static long long filetimeDiff(FILETIME, FILETIME);
+
+    /** Get the last item of a \-delimited path. */
+    static std::string getLastPathItem(LPWSTR path, DWORD size);
 
     /** Retrieves the engtype_3D instances from a large double-null separated string. */
     std::vector<WCHAR> parseGpuCounterPaths(std::vector<WCHAR> &instanceList);
@@ -95,7 +102,7 @@ public:
      * Get the path of the foreground process.
      * @return Empty string if the call to `QueryFullProcessImageName` fails.
      */
-    QString getFgProcessName();
+    std::string getFgProcessName();
 
     /**
      * Get the percent utilization of the GPU's 3D rendering engine by the current foreground process.
