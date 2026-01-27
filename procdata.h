@@ -27,7 +27,7 @@ class ProcData {
     static constexpr int MICROSEC_TO_FILETIME =  10;
 
     /** Resource name to use for `IWebmLocator::ConnectServer`. */
-    inline static const LPWSTR WMI_RESOURCE_NAME = L"ROOT\\CIMV2";
+    inline static const LPWSTR const WMI_RESOURCE_NAME = `L"ROOT\\CIMV2";
 
     /** Set to true if there were no errors during initialization. */
     bool initSuccess;

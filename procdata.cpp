@@ -126,7 +126,7 @@ std::string ProcData::getLastPathItem(LPWSTR path, DWORD size) {
             found_item = true;
         }
     }
-    int wchar_conversion_status = WideCharToMultiByte(
+    DWORD wchar_conversion_status = WideCharToMultiByte(
         CP_UTF8,
         0,
         (LPCWCH) end_sentinel,
@@ -137,7 +137,7 @@ std::string ProcData::getLastPathItem(LPWSTR path, DWORD size) {
         NULL
     );
 
-    std::string last_item{wchar_conversion_status, '\0'};
+    auto last_item = std::string(static_cast<size_t>(wchar_conversion_status), '\0');
 
     WideCharToMultiByte(
         CP_UTF8,
