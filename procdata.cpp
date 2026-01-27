@@ -1,5 +1,7 @@
 #include "procdata.h"
 
+LPWSTR ProcData::WMI_RESOURCE_NAME = L"ROOT\\CIMV2";
+
 ProcData::ProcData() {
     pLocate = NULL;
     pServ = NULL;
@@ -7,8 +9,8 @@ ProcData::ProcData() {
     lastProcHandle = NULL;
 
     // Need to make deep copy since ConnectServer does not accept a const pointer
-    LPWSTR resource_name = new WCHAR[strlen(WMI_RESOURCE_NAME) + 1];
-    strcpy(WMI_RESOURCE_NAME, resource_name);
+    LPWSTR resource_name = new WCHAR[lstrlenW(WMI_RESOURCE_NAME) + 1];
+    lstrcpyW(WMI_RESOURCE_NAME, resource_name);
 
     HRESULT hres = CoInitializeSecurity(
         NULL,
