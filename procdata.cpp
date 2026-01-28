@@ -6,10 +6,6 @@ ProcData::ProcData() {
     lastProc = 0;
     lastProcHandle = NULL;
 
-    // Need to make deep copy since ConnectServer does not accept a const pointer
-    LPWSTR resource_name = new WCHAR[lstrlenW(WMI_RESOURCE_NAME) + 1];
-    lstrcpyW(WMI_RESOURCE_NAME, resource_name);
-
     HRESULT hres = CoInitializeSecurity(
         NULL,
         -1,
@@ -38,7 +34,7 @@ ProcData::ProcData() {
         return;
     }
     hres = pLocate->ConnectServer(
-        BSTR(resource_name),
+        BSTR(WMI_RESOURCE_NAME),
         NULL,
         NULL,
         0,
@@ -46,9 +42,7 @@ ProcData::ProcData() {
         0,
         0,
         &pServ
-        );
-
-    delete resource_name;
+    );
     if (FAILED(hres)) {
         initSuccess = false;
         return;

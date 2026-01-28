@@ -13,7 +13,7 @@ ProcData DataInits::data_source;
 
 TEST(PROCESS_CHECKS, CheckForFgNameCall) {
 
-    QString fgProcName = DataInits::data_source.getFgProcessName();
+    std::string fgProcName = DataInits::data_source.getFgProcessName();
     EXPECT_GT(fgProcName.size(), 0);
 }
 

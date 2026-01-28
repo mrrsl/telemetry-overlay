@@ -11,8 +11,6 @@
 #include <winnt.h>
 
 #include <string>
-// For dealing with win32's raw character arrays
-#include <string.h>
 #include <vector>
 
 #pragma comment(lib, "wbemuuid.lib")
@@ -26,8 +24,11 @@ class ProcData {
     /** Reminder: the full quad-word stored in FILETIME represents the number of 100-nanosecond units. */
     static constexpr int MICROSEC_TO_FILETIME =  10;
 
-    /** Resource name to use for `IWebmLocator::ConnectServer`. */
-    inline static const LPWSTR const WMI_RESOURCE_NAME = L"ROOT\\CIMV2";
+    /**
+     *  Resource name to use for `IWebmLocator::ConnectServer`.
+     *  TODO: give this a proper type name eventually and figure out how to maintain the proper const qualifier in a `BSTR` call.
+     */
+    inline static const auto WMI_RESOURCE_NAME = L"ROOT\\CIMV2";
 
     /** Set to true if there were no errors during initialization. */
     bool initSuccess;
