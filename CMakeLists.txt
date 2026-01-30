@@ -65,6 +65,7 @@ qt_add_qml_module(apphw_overlay
     SOURCES
         main.cpp
         datamanager.h
+        SOURCES historybuffer.h
 )
 
 # Qt for iOS sets MACOSX_BUNDLE_GUI_IDENTIFIER automatically since Qt 6.1.
