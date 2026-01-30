@@ -41,8 +41,7 @@ void DataManager::update() {
 }
 
 DataManager::~DataManager() {
-    exit_requested = true;
-    update_thread.join();
+    update_thread.~thread();
     data_source.~ProcData();
 }
 
@@ -67,24 +66,31 @@ unsigned DataManager::MemProcKb() const {
 }
 
 void DataManager::sampleCpuTimes() {
+    typedef unsigned long long ull;
 
     double core_time_div = static_cast<double>(core_time_interval);
-    unsigned long long total_cpu_time = data_source.getTotalCpuTime();
-    unsigned long long total_proc_time = data_source.getTotalProcessTime();
-    unsigned long long cpu_diff = 0;
-    unsigned long long proc_diff = 0;
 
-    if (last_cpu_measurement < 0) {
+    // Snapshots to minimize the effect of a potential race condition
+    ull last_cpu_measurement_snapshot = last_cpu_measurement;
+    ull last_cpu_proc_snapshot = last_proc_measurement;
+
+    ull total_cpu_time = data_source.getTotalCpuTime();
+    ull total_proc_time = data_source.getTotalProcessTime();
+
+    ull cpu_diff = 0;
+    ull proc_diff = 0;
+
+    if (last_cpu_measurement_snapshot < 0) {
         calculated_use = 0.0;
     } else {
-        cpu_diff = total_cpu_time - last_cpu_measurement;
+        cpu_diff = total_cpu_time - last_cpu_measurement_snapshot;
         calculated_use = cpu_diff / core_time_div;
     }
 
-    if (last_proc_measurement < 0) {
+    if (last_cpu_proc_snapshot < 0) {
         calculated_proc_use = 0.0;
     } else {
-        proc_diff = total_proc_time - last_proc_measurement;
+        proc_diff = total_proc_time - last_cpu_proc_snapshot;
         // Account for changing foreground process;
         if (proc_diff < 0)
             proc_diff = 0;

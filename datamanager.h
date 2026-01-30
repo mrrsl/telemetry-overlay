@@ -39,28 +39,48 @@ class DataManager: public QObject {
     /** Bytes of memory used by current process. */
     int64_t m_MemProc;
 
-    /** Thread-UNSAFE container of CPU state. */
     std::vector<hwinfo::CPU> m_cpus;
 
+    /**
+     * Thread to update CPU time readings. Note:
+     *  - We don't intend for this to do very frequent sampling so no synchronization will be taking place
+     */
     std::thread update_thread;
 
     bool exit_requested;
 
+    /** Most recent measurement of time spent by CPU in kernel and user mode. */
     unsigned long long last_cpu_measurement;
 
+    /**
+     *  Most recent measurement of CPU time taken by the foreground process.
+     *  This WILL jump around if the user frequently swaps between foreground processes.
+     */
     unsigned long long last_proc_measurement;
 
+    /**
+     * Effectively the maximum amount of time the CPU can operate for the instance's update interval.
+     * (ie. # of logical cores * update interval)
+     */
     unsigned long long core_time_interval;
 
+    /**
+     * The most recent calculated usage %. Value will be in `[0, 1)`.
+     */
     double calculated_use;
 
+    /**
+     * Most recent calculated foreground process usgae %. Value will be in `[0, 1)`.
+     */
     double calculated_proc_use;
 
-    /** Refresh function. */
+    /** Sample hardware data once. */
     void update();
 
+    /** Contains the loop run by the update thread. */
     void updateLoop();
 
+    /** Utility function to collect and process CPU sampling data. */
     void sampleCpuTimes();
 
 public:
