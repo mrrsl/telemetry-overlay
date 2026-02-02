@@ -19,7 +19,7 @@ DataManager::DataManager(QObject *parent):
     core_time_interval = m_interval *
         MILI_TO_MICROSEC *
         m_cpus[0].numLogicalCores();
-    exit_requested = false;
+
 
     update();
     update_thread = std::thread(&DataManager::updateLoop, this);
@@ -32,7 +32,9 @@ void DataManager::update() {
     const hwinfo::Memory mem;
     m_MemUsed = m_MemTotal - mem.available_Bytes();
     m_MemProc = data_source.getFgProcessMemory();
+
     sampleCpuTimes();
+    sampleProcHandle();
     
     emit notifyMemUsedKb();
     emit notifyMemProcKb();
@@ -41,14 +43,14 @@ void DataManager::update() {
 }
 
 DataManager::~DataManager() {
-    exit_requested = true;
-    update_thread.join();
+    update_thread.detach();
+    update_thread.~thread();
     data_source.~ProcData();
 }
 
 void DataManager::updateLoop() {
 
-    while (!exit_requested) {
+    while (true) {
         update();
         std::this_thread::sleep_for(std::chrono::milliseconds(m_interval));
     }
@@ -113,4 +115,20 @@ unsigned DataManager::RefreshIntervalMs() const {
 bool ProcData::procHandleValid(HANDLE procHandle) {
     DWORD handleStatus = WaitForSingleObject(procHandle, 0);
     return handleStatus == WAIT_TIMEOUT;
+}
+
+QString DataManager::ForegroundProc() {
+    std::string foreground_name_st_string = data_source.getFgProcessName();
+    return QString::fromStdString(foreground_name_st_string);
+}
+
+void DataManager::sampleProcHandle() {
+
+    auto handle = data_source.getFgProcHandle();
+    HANDLE_INT_T handle_int = reinterpret_cast<HANDLE_INT_T>(handle);
+
+    if (handle_int != last_proc_handle) {
+        emit notifyForegroundProc(ForegroundProc());
+        last_proc_handle = handle_int;
+    }
 }

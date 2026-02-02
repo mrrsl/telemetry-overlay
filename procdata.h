@@ -30,6 +30,12 @@ class ProcData {
      */
     inline static const auto WMI_RESOURCE_NAME = L"ROOT\\CIMV2";
 
+    /**
+     *  Older versions of windows limited the name length to 256.
+     *  - not gonna bother dealing with the potential for length 10,000 names.
+     */
+    static constexpr unsigned PROC_NAME_MAX_LENGTH = 256;
+
     /** Set to true if there were no errors during initialization. */
     bool initSuccess;
 
