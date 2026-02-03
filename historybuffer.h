@@ -1,20 +1,48 @@
 #ifndef HISTORYBUFFER_H
 #define HISTORYBUFFER_H
 
-#include<immintrin.h>
+#include <vector>
+#include <QVector>
+
+namespace HWOverlay {
 
 /**
- * @brief Class for quickly storing historical sampling data
+ * Class for quickly storing historical sampling data as a value between `[0, 1)`.
+ * Goals for this class:
+ *  - Avoid making the QML engine iterate through the entire array to update the rolling sample history
+ *  - Reduce the constant memory allocations made by QML whenever a new history entry is pushed onto the Array
+ *
+ * Since the use case involves consistent sampling intervals, no timestamps will be recorded.
  */
-template<typename sample_type>
+
 class HistoryBuffer
 {
-    /** Maximum number of elements. */
-    unsigned size;
+
+
+    std::vector<float> buffer;
 
 public:
-    HistoryBuffer();
-    HistoryBuffer(unsigned);
+    /**
+     * Reserve an initial size for HistoryBuffer.
+     * @param initial_size Initial size of the internal buffer.
+     */
+    HistoryBuffer(unsigned initial_size);
+
+    /**
+     * Deep copy semantics.
+     * @param Will not share ownership of any members.
+     */
+    HistoryBuffer(const HistoryBuffer&);
+
+    ~HistoryBuffer();
+
+    /**
+     * Adds a measurement to the buffer.
+     *
+     */
+    void add(float measurement);
+
 };
 
+}
 #endif // HISTORYBUFFER_H
