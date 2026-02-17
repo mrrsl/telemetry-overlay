@@ -42,6 +42,7 @@ class ProcData {
 
     //static constexpr auto GPU_ENGINE_FORMAT = L"\\GPU Engine\\(%s)\\Utilization Percentage";
 
+    /** Holds the query for GPU counter paths. */
     static PDH_COUNTER_PATH_ELEMENTS counter_parts;
 
     /** Handle for calling pdh functions. */
@@ -103,12 +104,6 @@ public:
      * @return Vector array containing the path with the given PID.
      */
     static std::vector<WCHAR> parseGpuCounterPaths(DWORD pid, LPWSTR list, DWORD list_length);
-
-    /** Check if a GPU instance path has the given PID. */
-    static bool instanceHasPid(DWORD pid, std::vector<WCHAR>::iterator beg, std::vector<WCHAR>::iterator end);
-
-    /** Check if an instance path has the correct one for GPU 3D utilization. */
-    static bool correctInstanceType(std::vector<WCHAR>::iterator beg, std::vector<WCHAR>::iterator end);
 
     /**
      * Get the instance path for the foreground process.

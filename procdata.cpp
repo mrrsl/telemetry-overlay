@@ -5,7 +5,7 @@
 #endif
 
 HANDLE ProcData::process_heap = NULL;
-PDH_COUNTER_PATH_ELEMENTS ProcData::counter_parts;
+PDH_COUNTER_PATH_ELEMENTS ProcData::counter_parts = {};
 bool ProcData::initSuccess = false;
 
 ProcData::ProcData() {
@@ -13,7 +13,8 @@ ProcData::ProcData() {
     pServ = NULL;
     lastProc = 0;
     lastProcHandle = NULL;
-    init_pdh_counters();
+    ZeroMemory(&counter_parts, sizeof(PDH_COUNTER_PATH_ELEMENTS));
+
 
     HRESULT hres = CoInitializeSecurity(
         NULL,
@@ -62,6 +63,7 @@ ProcData::ProcData() {
         return;
     }
 
+    init_pdh_counters();
     initSuccess = true;
 }
 
@@ -83,7 +85,6 @@ ProcData::~ProcData() {
 }
 // TODO: replace the HeapAlloc'd strings with data pointers to instantiated wstrings
 void ProcData::init_pdh_counters() {
-
     if (initSuccess)
         return;
 
@@ -105,9 +106,9 @@ void ProcData::init_pdh_counters() {
     counter_parts.dwInstanceIndex = 0;
     counter_parts.szCounterName = (LPWSTR) HeapAlloc(process_heap, HEAP_ZERO_MEMORY, gpu_count_len);
 
-    std::memcpy((void*) PDH_GPU_OBJ, counter_parts.szObjectName, gpu_obj_len);
-    std::memcpy((void*) PDH_INSTANCE_FILTER, counter_parts.szInstanceName, gpu_inst_len);
-    std::memcpy((void*) PDH_COUNTER_NAME, counter_parts.szCounterName, gpu_count_len);
+    std::memcpy((void*) counter_parts.szObjectName, PDH_GPU_OBJ, gpu_obj_len);
+    std::memcpy((void*) counter_parts.szInstanceName, PDH_INSTANCE_FILTER, gpu_inst_len);
+    std::memcpy((void*) counter_parts.szCounterName, PDH_COUNTER_NAME, gpu_count_len);
 
     DWORD full_name_size = 0;
     PdhMakeCounterPath(&counter_parts, NULL, &full_name_size, 0);
@@ -263,42 +264,6 @@ std::string ProcData::getFgProcessName() {
     return process_name;
 }
 
-bool ProcData::correctInstanceType(std::vector<WCHAR>::iterator beg, std::vector<WCHAR>::iterator end) {
-    const std::wstring expectedEnding = std::wstring(L"engtype_3D");
-
-    if (end - beg < 0 || end - beg < expectedEnding.size()) return false;
-    auto sentinel = end - expectedEnding.size();
-
-    std::wstring parsedEnding = std::wstring(sentinel, end);
-
-    return expectedEnding == parsedEnding;
-}
-
-bool ProcData::instanceHasPid(DWORD pid, std::vector<WCHAR>::iterator beg, std::vector<WCHAR>::iterator end) {
-    std::wstring pidString = std::to_wstring(pid);
-    const std::wstring expected_prefix = std::wstring(L"pid");
-
-    bool parsedPidPrefix = false;
-    auto sentinel = beg;
-
-    // Keep it for DRY
-    auto advanceSentinel = [&sentinel]() {
-        while (*sentinel != L'_') sentinel++;
-    };
-
-    // parse for "pid" first, then attempt to parse the number
-    advanceSentinel();
-    std::wstring parsed_prefix = std::wstring(beg, sentinel);
-    if (expected_prefix != parsed_prefix) return false;
-    
-    beg = sentinel + 1;
-    sentinel += 2;
-    if (sentinel >= end) return false;
-    advanceSentinel();
-    std::wstring parsedPid = std::wstring(beg, sentinel);
-
-    return pidString == parsedPid;
-}
 bool check_path_pid(DWORD pid, LPWSTR begin, LPWSTR end) {
     // we're relying on WCHAR being 2 bytes in size so the full 4 WCHAR prefix should fit into a 64 bit type
     const auto pid_marker = L"pid_";
@@ -395,7 +360,7 @@ double ProcData::getFgProcessGpuUsage() {
     wch_vec gpu_fg_path = getFgGpuPath(lastProcHandle, pdh_wildcard_path.data());
 
 #ifdef GTEST_PRESENT
-    std::wcerr << std::wstring(gpuPath.begin(), gpuPath.end()) << std::endl;
+    std::cerr << std::wstring(gpuPath.begin(), gpuPath.end()) << std::endl;
 #endif
 
 
