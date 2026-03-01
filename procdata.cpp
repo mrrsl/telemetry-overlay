@@ -167,6 +167,7 @@ std::string ProcData::getLastPathItem(LPWSTR path, DWORD size) {
      * - path uses the win32 format
      * - LPWSTR and CHAR resolve to wchar_t* and wchar_t and thus can be used with std::wstring
      */
+
     LPWSTR end_sentinel = path + size;
     LPWSTR start_sentinel = end_sentinel - 1;
     bool found_item = false;
