@@ -48,6 +48,12 @@ class ProcData {
     /** Handle for calling pdh functions. */
     static PDH_HCOUNTER gpu_counter_handle;
 
+    /**
+     *  Older versions of windows limited the name length to 256.
+     *  - not gonna bother dealing with the potential for length 10,000 names.
+     */
+    static constexpr unsigned PROC_NAME_MAX_LENGTH = 256;
+
     /** Set to true if there were no errors during initialization. */
     static bool initSuccess;
 

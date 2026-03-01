@@ -250,15 +250,14 @@ unsigned long long ProcData::getFgProcessMemory() {
 }
 
 std::string ProcData::getFgProcessName() {
-    // QueryFullProcessImageName does not let us peek at the length of the process name before hand
-    constexpr unsigned max_buffer_size = 256;
+
     HANDLE fgHandle = getFgProcHandle();
 
     if (fgHandle == NULL)
         return std::string("");
 
-    DWORD written_size = max_buffer_size;
-    WCHAR titleBuffer[max_buffer_size];
+    DWORD written_size = PROC_NAME_MAX_LENGTH;
+    WCHAR titleBuffer[PROC_NAME_MAX_LENGTH];
     QueryFullProcessImageName(fgHandle, 0, titleBuffer, &written_size);
     std::string process_name = getLastPathItem(titleBuffer, written_size);
 
