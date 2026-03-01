@@ -89,10 +89,10 @@ class DataManager: public QObject {
 public:
     Q_PROPERTY(unsigned RefreshIntervalMs READ RefreshIntervalMs)
     Q_PROPERTY(unsigned MemTotalKb READ MemTotalKb)
-    Q_PROPERTY(unsigned MemUsedKb READ MemUsedKb NOTIFY notifyMemUsedKb)
-    Q_PROPERTY(unsigned MemProcKb READ MemProcKb NOTIFY notifyMemProcKb)
-    Q_PROPERTY(double CpuTotalUse READ CpuTotal NOTIFY notifyCpuTotal)
-    Q_PROPERTY(double CpuProcUse READ CpuProcUse NOTIFY notifyCpuProcUse)
+    Q_PROPERTY(unsigned MemUsedKb READ MemUsedKb)
+    Q_PROPERTY(unsigned MemProcKb READ MemProcKb)
+    Q_PROPERTY(double CpuTotalUse READ CpuTotal)
+    Q_PROPERTY(double CpuProcUse READ CpuProcUse)
     Q_PROPERTY(QString ForegroundProc READ ForegroundProc NOTIFY notifyForegroundProc)
 
     explicit DataManager(QObject*);
@@ -110,10 +110,10 @@ public:
 
 
     /** Return total CPU utilization. */
-    double CpuTotal();
+    qreal CpuTotal();
 
     /** CPU utilization by the current foreground process. */
-    double CpuProcUse();
+    qreal CpuProcUse();
 
     /** Returns the name of the foreground process. **/
     QString ForegroundProc();
@@ -122,10 +122,9 @@ public:
     unsigned RefreshIntervalMs() const;
 
 signals:
-    void notifyMemUsedKb();
-    void notifyMemProcKb();
-    void notifyCpuTotal();
-    void notifyCpuProcUse();
+    /** Notify when memory usage stats are updated. */
+    void notifyUpdatedMemory(quint64 total, quint64 total_used, quint64 proc_used);
+    void notifyUpdatedCpu(qreal total, qreal proc);
     void notifyForegroundProc(QString);
 };
 

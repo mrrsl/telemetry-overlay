@@ -35,10 +35,13 @@ void DataManager::update() {
     sampleCpuTimes();
     sampleProcHandle();
     
-    emit notifyMemUsedKb();
-    emit notifyMemProcKb();
-    emit notifyCpuTotal();
-    emit notifyCpuProcUse();
+    quint64 total = m_MemTotal,
+            total_used = m_MemUsed,
+            proc_used = m_MemProc;
+
+    emit notifyUpdatedMemory(total, total_used, proc_used);
+    emit notifyUpdatedCpu(CpuTotal(), CpuProcUse());
+
 }
 
 DataManager::~DataManager() {
@@ -99,11 +102,11 @@ void DataManager::sampleCpuTimes() {
     last_proc_measurement = total_proc_time;
 }
 
-double DataManager::CpuProcUse() {
+qreal DataManager::CpuProcUse() {
     return calculated_proc_use;
 }
 
-double DataManager::CpuTotal() {
+qreal DataManager::CpuTotal() {
     return calculated_use;
 }
 
@@ -130,7 +133,7 @@ void DataManager::sampleProcHandle() {
         std::string window_text = data_source.getFgProcessName();
         QString q_window_text = QString::fromStdString(window_text);
 
-        // emit notifyForegroundProc(q_window_text);
+        emit notifyForegroundProc(q_window_text);
         last_proc_handle = handle_int;
     }
 }
