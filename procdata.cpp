@@ -66,7 +66,7 @@ bool ProcData::initSuccessful() const {
 HANDLE ProcData::getFgProcHandle() {
     HWND hForeground = GetForegroundWindow();
     DWORD procId;
-    DWORD procThreadId = GetWindowThreadProcessId(hForeground, &procId);
+    GetWindowThreadProcessId(hForeground, &procId);
 
     if (procId == 0)
         return NULL;
@@ -111,14 +111,15 @@ std::string ProcData::getLastPathItem(LPWSTR path, DWORD size) {
      */
     LPWSTR end_sentinel = path + size;
     LPWSTR start_sentinel = end_sentinel - 1;
-    bool found_item = false;
 
 
-    while (start_sentinel > path && !found_item) {
+    while (start_sentinel > path) {
         WCHAR ch = *start_sentinel;
         if (ch == L'\\') {
-            found_item = true;
+            start_sentinel++;
+            break;
         }
+        start_sentinel--;
     }
     DWORD wchar_conversion_status = WideCharToMultiByte(
         CP_UTF8,

@@ -1,6 +1,5 @@
 #include "datamanager.h"
 
-
 const QString DataManager::PERCENT_POSTFIX = QString::fromUtf8(" %");
 
 DataManager::DataManager(QObject *parent):
@@ -128,7 +127,10 @@ void DataManager::sampleProcHandle() {
     HANDLE_INT_T handle_int = reinterpret_cast<HANDLE_INT_T>(handle);
 
     if (handle_int != last_proc_handle) {
-        emit notifyForegroundProc(ForegroundProc());
+        std::string window_text = data_source.getFgProcessName();
+        QString q_window_text = QString::fromStdString(window_text);
+
+        // emit notifyForegroundProc(q_window_text);
         last_proc_handle = handle_int;
     }
 }

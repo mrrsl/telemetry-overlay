@@ -2,14 +2,13 @@
 #define DATAMANAGER_H
 
 #include <thread>
-#include <chrono>
 #include <cstdint>
 
 #include <QObject>
 #include <QString>
-
-#include "hwinfo/hwinfo.h"
 #include "procdata.h"
+
+#include <hwinfo/hwinfo.h>
 
 // Word size check macro courtesy of alex tingle @ https://stackoverflow.com/questions/1505582/determining-32-vs-64-bit-in-c
 #if (INTPTR_MAX == INT32_MAX)
