@@ -52,6 +52,7 @@ qt_add_library(datamanager
 target_link_libraries(datamanager
     PUBLIC
         procdata
+        Qt::Quick
         lfreist-hwinfo::hwinfo
 )
 
