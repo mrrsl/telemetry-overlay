@@ -47,7 +47,7 @@ std::string separate_numbers(int64_t number) {
 
 TEST(PROCESS_CHECKS, CheckForFgNameCall) {
 
-    std::string fgProcName = DataInits::data_source.getFgProcessName();
+    std::wstring fgProcName = DataInits::data_source.getFgProcessName();
     EXPECT_GT(fgProcName.size(), 0);
 }
 

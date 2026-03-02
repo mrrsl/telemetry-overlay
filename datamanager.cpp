@@ -15,6 +15,12 @@ DataManager::DataManager(QObject *parent):
     calculated_use = 0.0;
     calculated_proc_use = 0.0;
 
+#ifdef WIN32
+    last_pid = 0;
+#else
+    last_pid = -1;
+#endif
+
     core_time_interval = m_interval *
         MILI_TO_MICROSEC *
         m_cpus[0].numLogicalCores();
@@ -120,20 +126,18 @@ bool ProcData::procHandleValid(HANDLE procHandle) {
 }
 
 QString DataManager::ForegroundProc() {
-    std::string foreground_name_st_string = data_source.getFgProcessName();
-    return QString::fromStdString(foreground_name_st_string);
+    std::wstring foreground_name_st_string = data_source.getFgProcessName();
+    return QString::fromStdWString(foreground_name_st_string);
 }
 
 void DataManager::sampleProcHandle() {
 
-    auto handle = data_source.getFgProcHandle();
-    HANDLE_INT_T handle_int = reinterpret_cast<HANDLE_INT_T>(handle);
+    // Sidestepping the need to use Win32 types by doing this scuffed comparison
+    auto pid = data_source.getFgProcId();
 
-    if (handle_int != last_proc_handle) {
-        std::string window_text = data_source.getFgProcessName();
-        QString q_window_text = QString::fromStdString(window_text);
+    if (pid != last_pid) {
 
-        emit notifyForegroundProc(q_window_text);
-        last_proc_handle = handle_int;
+        last_pid = pid;
+        emit notifyForegroundProc(this->ForegroundProc());
     }
 }

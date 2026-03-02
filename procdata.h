@@ -62,6 +62,9 @@ public:
     /** Gets the handle for the process that created the current foreground window. */
     HANDLE getFgProcHandle();
 
+    /** Get the last recorded foreground proc ID. */
+    DWORD getFgProcId() const;
+
     /** Sum two 'FILETIME's into a single integral type. */
     static unsigned long long filetimeSum(FILETIME, FILETIME);
 
@@ -69,7 +72,7 @@ public:
     static long long filetimeDiff(FILETIME, FILETIME);
 
     /** Get the last item of a \-delimited path. */
-    static std::string getLastPathItem(LPWSTR path, DWORD size);
+    static std::wstring getLastPathItem(LPWSTR path, DWORD size);
 
     /** Retrieves the engtype_3D instances from a large double-null separated string. */
     std::vector<WCHAR> parseGpuCounterPaths(std::vector<WCHAR> &instanceList);
@@ -112,7 +115,7 @@ public:
      * Get the path of the foreground process.
      * @return Empty string if the call to `QueryFullProcessImageName` fails.
      */
-    std::string getFgProcessName();
+    std::wstring getFgProcessName();
 
     /**
      * Get the percent utilization of the GPU's 3D rendering engine by the current foreground process.

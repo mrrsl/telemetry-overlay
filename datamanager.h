@@ -10,13 +10,6 @@
 
 #include <hwinfo/hwinfo.h>
 
-// Word size check macro courtesy of alex tingle @ https://stackoverflow.com/questions/1505582/determining-32-vs-64-bit-in-c
-#if (INTPTR_MAX == INT32_MAX)
-    #define HANDLE_INT_T int32_t
-#else
-    #define HANDLE_INT_T int64_t
-#endif
-
 /**
  * Preferred interface for accessing hardware utilization metrics.
  * The class will store the last measurements recorded due to how CPU utilization needs to be calculated.
@@ -71,8 +64,8 @@ class DataManager: public QObject {
     /** Foreground CPU utilization. */
     double calculated_proc_use;
 
-    /** Last foreground process recorded. */
-    HANDLE_INT_T last_proc_handle;
+    /** Last foreground process recorded. Initialize to 0 on Windows, -1 on Unix. */
+    int last_pid;
 
     /** Refresh function. */
     void update();

@@ -82,6 +82,10 @@ HANDLE ProcData::getFgProcHandle() {
     return lastProcHandle;
 }
 
+DWORD ProcData::getFgProcId() const {
+    return lastProc;
+}
+
 unsigned long long ProcData::filetimeSum(FILETIME ft0, FILETIME ft1) {
     ULARGE_INTEGER a0 {0}, a1 {0};
     a0.HighPart = ft0.dwHighDateTime;
@@ -102,7 +106,7 @@ long long ProcData::filetimeDiff(FILETIME ft0, FILETIME ft1) {
     return a0.QuadPart - a1.QuadPart;
 }
 
-std::string ProcData::getLastPathItem(LPWSTR path, DWORD size) {
+std::wstring ProcData::getLastPathItem(LPWSTR path, DWORD size) {
     /*
      * This function makes the following assumptions:
      * - path is null-terminated
@@ -121,29 +125,8 @@ std::string ProcData::getLastPathItem(LPWSTR path, DWORD size) {
         }
         start_sentinel--;
     }
-    DWORD wchar_conversion_status = WideCharToMultiByte(
-        CP_UTF8,
-        0,
-        (LPCWCH) end_sentinel,
-        -1,
-        NULL,
-        0,
-        NULL,
-        NULL
-    );
 
-    auto last_item = std::string(static_cast<size_t>(wchar_conversion_status), '\0');
-
-    WideCharToMultiByte(
-        CP_UTF8,
-        0,
-        (LPCWCH) end_sentinel,
-        -1,
-        last_item.data(),
-        wchar_conversion_status,
-        NULL,
-        NULL
-    );
+    std::wstring last_item(start_sentinel);
 
     return last_item;
 }
@@ -191,17 +174,19 @@ unsigned long long ProcData::getFgProcessMemory() {
     else return 0;
 }
 
-std::string ProcData::getFgProcessName() {
+std::wstring ProcData::getFgProcessName() {
 
     HANDLE fgHandle = getFgProcHandle();
 
     if (fgHandle == NULL)
-        return std::string("");
+        return std::wstring(L"");
 
     DWORD written_size = PROC_NAME_MAX_LENGTH;
-    WCHAR titleBuffer[PROC_NAME_MAX_LENGTH];
-    QueryFullProcessImageName(fgHandle, 0, titleBuffer, &written_size);
-    std::string process_name = getLastPathItem(titleBuffer, written_size);
+    WCHAR title_buffer[PROC_NAME_MAX_LENGTH];
+    ZeroMemory(title_buffer, written_size * sizeof(WCHAR));
+
+    QueryFullProcessImageName(fgHandle, 0, title_buffer, &written_size);
+    std::wstring process_name = getLastPathItem(title_buffer, written_size);
 
     return process_name;
 }
