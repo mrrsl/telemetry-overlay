@@ -42,7 +42,6 @@ class DataManager: public QObject {
 
     std::vector<hwinfo::CPU> m_cpus;
 
-<<<<<<< HEAD
     /**
      * Thread to update CPU time readings. Note:
      *  - We don't intend for this to do very frequent sampling so no synchronization will be taking place
@@ -51,41 +50,6 @@ class DataManager: public QObject {
 
     bool exit_requested;
 
-    /** Most recent measurement of time spent by CPU in kernel and user mode. */
-    unsigned long long last_cpu_measurement;
-
-    /**
-     *  Most recent measurement of CPU time taken by the foreground process.
-     *  This WILL jump around if the user frequently swaps between foreground processes.
-     */
-    unsigned long long last_proc_measurement;
-
-    /**
-     * Effectively the maximum amount of time the CPU can operate for the instance's update interval.
-     * (ie. # of logical cores * update interval)
-     */
-    unsigned long long core_time_interval;
-
-    /**
-     * The most recent calculated usage %. Value will be in `[0, 1)`.
-     */
-    double calculated_use;
-
-    /**
-     * Most recent calculated foreground process usgae %. Value will be in `[0, 1)`.
-     */
-    double calculated_proc_use;
-
-    /** Sample hardware data once. */
-    void update();
-
-    /** Contains the loop run by the update thread. */
-    void updateLoop();
-
-    /** Utility function to collect and process CPU sampling data. */
-=======
-    /** Separate thread that updates measurements according to `m_interval`. */
-    std::thread update_thread;
 
     /** Last measurement of total kernal and user time spent by the CPU. */
     unsigned long long last_cpu_measurement;
@@ -115,7 +79,6 @@ class DataManager: public QObject {
     void updateLoop();
 
     /** Helper function to update CPU measurements. */
->>>>>>> main
     void sampleCpuTimes();
 
     /** Checks the underlying datasource for the current handle to the foreground application. Notify if it's different from the last one. */
