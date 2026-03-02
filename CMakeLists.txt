@@ -64,7 +64,6 @@ qt_add_qml_module(apphw_overlay
         qml/CommonGraph.qml
     SOURCES
         main.cpp
-        datamanager.h
 )
 
 # Qt for iOS sets MACOSX_BUNDLE_GUI_IDENTIFIER automatically since Qt 6.1.
