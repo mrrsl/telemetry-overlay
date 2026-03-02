@@ -112,8 +112,9 @@ target_link_libraries(test_errors
     datamanager
 )
 target_compile_options(test_errors
-    PUBLIC
+    PRIVATE
     /Zi
+    /DGTEST_PRESENT
 )
 
 include(GoogleTest)
