@@ -65,6 +65,9 @@ qt_add_qml_module(apphw_overlay
     SOURCES
         main.cpp
         datamanager.h
+        SOURCES historybuffer.h
+        SOURCES historybuffer.cpp
+        SOURCES
 )
 
 # Qt for iOS sets MACOSX_BUNDLE_GUI_IDENTIFIER automatically since Qt 6.1.
@@ -113,8 +116,9 @@ target_link_libraries(test_errors
     datamanager
 )
 target_compile_options(test_errors
-    PUBLIC
+    PRIVATE
     /Zi
+    /DGTEST_PRESENT
 )
 
 include(GoogleTest)
