@@ -37,7 +37,6 @@ qt_add_library(procdata
     procdata.cpp
 )
 target_link_libraries(procdata
-    Qt6::Quick
     pdh
 )
 
@@ -50,6 +49,22 @@ target_link_libraries(datamanager
     PUBLIC
         procdata
         lfreist-hwinfo::hwinfo
+)
+
+qt_add_library(samplepoint
+    STATIC
+    sample_point.h
+    sample_point.cpp
+)
+
+qt_add_library(histbuff
+    INTERFACE
+        historybuffer.h
+)
+target_link_libraries(histbuff
+    INTERFACE
+        samplepoint
+        Qt6::Core
 )
 
 qt_add_executable(apphw_overlay
@@ -90,6 +105,7 @@ target_link_libraries(apphw_overlay
         Qt6::Quick
         Qt6::Graphs
         Qt6::Widgets
+        Qt6::Core
         lfreist-hwinfo::hwinfo
         procdata
         datamanager

@@ -2,6 +2,8 @@
 #include <gmock/gmock.h>
 
 #include "procdata.h"
+#include "historybuffer.h"
+#include "sample_point.h"
 
 class DataInits : public ::testing::Environment {
 public:
@@ -87,5 +89,21 @@ TEST(STATIC_FUNC_CHECKS, GetLastPathVerify) {
     std::wstring short_name = DataInits::data_source.getLastPathItem(short_path, std::wcslen(short_path));
 
     EXPECT_STREQ(L"qtcreator.exe", qtc_name.data());
+}
 
+TEST(CIRC_BUFFER_TEST, BasicInit) {
+
+    constexpr int buff_limit = 20;
+    constexpr int loop_limit = (buff_limit * 3) / 2;
+
+    HWOverlay::HistoryBuffer<buff_limit> hbuff;
+    
+    for (auto a = 0; a < loop_limit; a++) {
+        hbuff.add(a);
+    }
+    
+    std::vector<HWOverlay::SamplePoint> sample = hbuff.get_linear_buffer();
+    HWOverlay::SamplePoint latest = *(sample.rbegin());
+
+    ASSERT_DOUBLE_EQ(30.0, latest.measurement);
 }
