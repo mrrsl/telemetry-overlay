@@ -51,10 +51,7 @@ void DataManager::update() {
 }
 
 DataManager::~DataManager() {
-<<<<<<< HEAD
-=======
     update_thread.detach();
->>>>>>> main
     update_thread.~thread();
     data_source.~ProcData();
 }
