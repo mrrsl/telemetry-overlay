@@ -20,7 +20,9 @@ int main(int argc, char *argv[])
         &app,
         []() { QCoreApplication::exit(-1); },
         Qt::QueuedConnection);
-    engine.loadFromModule("hw_overlay", "Main");
+    
+    engine.loadFromModule("hw_overlay", "Overlay");
+    engine.loadFromModule("hw_overlay", "TrayButton");
 
     return app.exec();
 }

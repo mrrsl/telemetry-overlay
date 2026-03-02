@@ -1,0 +1,12 @@
+<RCC>
+    <qresource prefix="/">
+        <file alias="SystemIcon">images/speedo.svg</file>
+        <file>qml/Overlay.qml</file>
+        <file>qml/CommonGraph.qml</file>
+        <file>qml/CpuUsage.qml</file>
+        <file>qml/GraphHeading.qml</file>
+        <file>qml/Main.qml</file>
+        <file>qml/MemoryUsage.qml</file>
+        <file>qml/TrayButton.qml</file>
+    </qresource>
+</RCC>

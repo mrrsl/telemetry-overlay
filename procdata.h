@@ -57,6 +57,9 @@ class ProcData {
     /** Set to true if there were no errors during initialization. */
     static bool initSuccess;
 
+    /** Wildcard path to query pdh for the correct counter. */
+    std::vector<WCHAR> pdh_wildcard_path;
+
     /* Microsoft documentation isn't entirely clear what the dwUserData argument for Pdh functions actaully is for but most examples seem to use 0. */
     DWORD_PTR PDH_USER_PTR = 0;
 
@@ -74,9 +77,6 @@ class ProcData {
 
     /** PDH Handle to gather GPU data. */
     PDH_HQUERY gpu_query_handle;
-
-    /** Wildcard path to query pdh for the correct counter. */
-    std::vector<WCHAR> pdh_wildcard_path;
 
     /* Utility function */
     void init_pdh_counters();
@@ -119,7 +119,6 @@ public:
      *
      * @param proc_handle Process handle.
      * @param wildcard_path PDH counter path containing a wildcard.
-     * @param path_len length of `wildcard_path`
      */
     static std::vector<WCHAR> getFgGpuPath(HANDLE proc_handle, LPWSTR wildcard_path);
 
