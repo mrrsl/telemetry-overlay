@@ -164,7 +164,7 @@ long long ProcData::filetimeDiff(FILETIME ft0, FILETIME ft1) {
     return a0.QuadPart - a1.QuadPart;
 }
 
-std::wstring ProcData::getLastPathItem(LPWSTR path, DWORD size) {
+std::wstring ProcData::getLastPathItem(LPCWSTR path, DWORD size) {
     /*
      * This function makes the following assumptions:
      * - path is null-terminated
@@ -172,8 +172,8 @@ std::wstring ProcData::getLastPathItem(LPWSTR path, DWORD size) {
      * - LPWSTR and CHAR resolve to wchar_t* and wchar_t and thus can be used with std::wstring
      */
 
-    LPWSTR end_sentinel = path + size;
-    LPWSTR start_sentinel = end_sentinel - 1;
+    LPCWSTR end_sentinel = path + size;
+    LPCWSTR start_sentinel = end_sentinel - 1;
 
 
     while (start_sentinel > path) {

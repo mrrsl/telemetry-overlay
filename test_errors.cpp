@@ -78,8 +78,14 @@ TEST(PROCESS_CHECKS, CheckBothCpuCalls){
         separate_numbers(fg_time);
 }
 
-// Strictly making sure this doesn't error out since it makes several c-api calls
-TEST(PROCESS_CHECKS, CheckGpuPaths) {
-    double gpu_utilization = DataInits::data_source.getFgProcessGpuUsage();
-    ASSERT_TRUE(true) << "Utilization value = " << gpu_utilization;
+TEST(STATIC_FUNC_CHECKS, GetLastPathVerify) {
+
+    auto qtc_path_example = L"C:\\Qt\\bin\\qtcreator.exe";
+    auto short_path = L"C:\\a.exe";
+
+    std::wstring qtc_name = DataInits::data_source.getLastPathItem(qtc_path_example, std::wcslen(qtc_path_example));
+    std::wstring short_name = DataInits::data_source.getLastPathItem(short_path, std::wcslen(short_path));
+
+    EXPECT_STREQ(L"qtcreator.exe", qtc_name.data());
+
 }

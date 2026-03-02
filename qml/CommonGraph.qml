@@ -18,6 +18,8 @@ GraphsView {
     marginLeft: 0
     marginRight: 5
 
+    anchors.topMargin: -10
+
     theme: GraphsTheme {
         colorScheme: GraphsTheme.ColorScheme.Automatic
         backgroundVisible: false

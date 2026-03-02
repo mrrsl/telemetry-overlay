@@ -44,7 +44,7 @@ Window {
         id: proc_name
         text: qsTr("Waiting..")
         width: main_window.width
-        horizontalAlignment: Text.AlignHCenter
+        horizontalAlignment: Text.AlignLeft
         anchors.top: main_window.top
 
         color: "#000000"
@@ -58,12 +58,19 @@ Window {
                 proc_name.text = switched_proc;
             }
         }
+
+        Component.onCompleted: {
+            text = data_manager.ForegroundProc
+        }
     }
 
     GraphHeading {
         id: total_mem_title
         text: qsTr("Memory Usage")
+
         anchors.top: proc_name.bottom
+        // Set here since we don't have spacing issues with the process name text
+        anchors.topMargin: 0
     }
 
     MemoryUsage {

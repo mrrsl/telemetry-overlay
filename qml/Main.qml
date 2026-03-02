@@ -5,5 +5,3 @@ import Qt.labs.platform
 QtObject {
     Overlay {}
 }
-
-

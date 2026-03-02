@@ -101,7 +101,7 @@ public:
     static long long filetimeDiff(FILETIME, FILETIME);
 
     /** Get the last item of a \-delimited path. */
-    static std::wstring getLastPathItem(LPWSTR path, DWORD size);
+    static std::wstring getLastPathItem(LPCWSTR path, DWORD size);
 
     /**
      * Retrieves the engtype_3D instances from a large double-null separated string.

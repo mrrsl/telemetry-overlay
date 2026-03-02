@@ -10,4 +10,7 @@ Text {
     styleColor: "#efefef"
 
     font.family: "Courier"
+    font.pointSize: 10
+
+    anchors.topMargin: -25
 }
