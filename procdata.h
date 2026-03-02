@@ -57,6 +57,9 @@ class ProcData {
     /** Set to true if there were no errors during initialization. */
     static bool initSuccess;
 
+    /** Wildcard path to query pdh for the correct counter. */
+    std::vector<WCHAR> pdh_wildcard_path;
+
     /* Microsoft documentation isn't entirely clear what the dwUserData argument for Pdh functions actaully is for but most examples seem to use 0. */
     DWORD_PTR PDH_USER_PTR = 0;
 
@@ -75,9 +78,6 @@ class ProcData {
     /** PDH Handle to gather GPU data. */
     PDH_HQUERY gpu_query_handle;
 
-    /** Wildcard path to query pdh for the correct counter. */
-    std::vector<WCHAR> pdh_wildcard_path;
-
     /* Utility function */
     void init_pdh_counters();
 
@@ -91,6 +91,9 @@ public:
     /** Gets the handle for the process that created the current foreground window. */
     HANDLE getFgProcHandle();
 
+    /** Get the last recorded foreground proc ID. */
+    DWORD getFgProcId() const;
+
     /** Sum two 'FILETIME's into a single integral type. */
     static unsigned long long filetimeSum(FILETIME, FILETIME);
 
@@ -98,7 +101,7 @@ public:
     static long long filetimeDiff(FILETIME, FILETIME);
 
     /** Get the last item of a \-delimited path. */
-    static std::string getLastPathItem(LPWSTR path, DWORD size);
+    static std::wstring getLastPathItem(LPCWSTR path, DWORD size);
 
     /**
      * Retrieves the engtype_3D instances from a large double-null separated string.
@@ -116,7 +119,6 @@ public:
      *
      * @param proc_handle Process handle.
      * @param wildcard_path PDH counter path containing a wildcard.
-     * @param path_len length of `wildcard_path`
      */
     static std::vector<WCHAR> getFgGpuPath(HANDLE proc_handle, LPWSTR wildcard_path);
 
@@ -149,7 +151,7 @@ public:
      * Get the path of the foreground process.
      * @return Empty string if the call to `QueryFullProcessImageName` fails.
      */
-    std::string getFgProcessName();
+    std::wstring getFgProcessName();
 
     /**
      * Get the percent utilization of the GPU's 3D rendering engine by the current foreground process.

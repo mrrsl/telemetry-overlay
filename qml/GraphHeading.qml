@@ -1,9 +1,16 @@
 import QtQuick
 
 Text {
-    horizontalAlignment: Text.AlignHCenter
+    horizontalAlignment: Text.AlignLeft
     width: parent.width
+    textFormat: Text.PlainText
 
-    color: "#ffffff"
+    color: "#000000"
     style: Text.Outline
+    styleColor: "#efefef"
+
+    font.family: "Courier"
+    font.pointSize: 10
+
+    anchors.topMargin: -25
 }

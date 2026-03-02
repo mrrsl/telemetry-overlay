@@ -3,6 +3,7 @@ cmake_minimum_required(VERSION 3.16)
 project(hw_overlay VERSION 0.1 LANGUAGES CXX)
 
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
+set(CMAKE_AUTORCC ON)
 
 include(FetchContent)
 
@@ -12,6 +13,7 @@ find_package(Qt6
         Graphs
     REQUIRED
 )
+find_package(Qt6 REQUIRED COMPONENTS Widgets)
 
 qt_standard_project_setup(REQUIRES 6.8)
 
@@ -51,6 +53,7 @@ target_link_libraries(datamanager
 )
 
 qt_add_executable(apphw_overlay
+    Components.qrc
     main.cpp
 )
 
@@ -58,16 +61,17 @@ qt_add_qml_module(apphw_overlay
     URI hw_overlay
     QML_FILES
         qml/Main.qml
+        qml/Overlay.qml
         qml/MemoryUsage.qml
         qml/CpuUsage.qml
         qml/GraphHeading.qml
         qml/CommonGraph.qml
+        qml/TrayButton.qml
     SOURCES
         main.cpp
-        datamanager.h
-        SOURCES historybuffer.h
-        SOURCES historybuffer.cpp
-        SOURCES
+        #traymenu.h traymenu.cpp
+    RESOURCES
+        Components.qrc
 )
 
 # Qt for iOS sets MACOSX_BUNDLE_GUI_IDENTIFIER automatically since Qt 6.1.
@@ -85,11 +89,13 @@ target_link_libraries(apphw_overlay
     PRIVATE
         Qt6::Quick
         Qt6::Graphs
+        Qt6::Widgets
         lfreist-hwinfo::hwinfo
         procdata
         datamanager
 
 )
+target_link_libraries(apphw_overlay PRIVATE Qt6::Widgets)
 target_link_options(apphw_overlay
     PRIVATE
     "-static" "-Wl,--subsystem,windows"

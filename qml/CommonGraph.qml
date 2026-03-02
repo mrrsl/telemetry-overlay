@@ -1,8 +1,15 @@
 import QtQuick
 import QtGraphs
 
+/**
+Rolling sample history.
+- current time is t = 0
+- t is the negation of the time elapsed since the sample was recorded
+*/
 GraphsView {
     property int default_height: 150
+
+    // maximum time to keep historical data
     property int default_window_ms: -60 * 1000
 
     width: parent.width
@@ -10,6 +17,8 @@ GraphsView {
 
     marginLeft: 0
     marginRight: 5
+
+    anchors.topMargin: -10
 
     theme: GraphsTheme {
         colorScheme: GraphsTheme.ColorScheme.Automatic
@@ -33,5 +42,6 @@ GraphsView {
         tickInterval: 100
         gridVisible: false
         subGridVisible: false
+        alignment: Qt.AlignRight
     }
 }

@@ -1,6 +1,5 @@
 #include "datamanager.h"
 
-
 const QString DataManager::PERCENT_POSTFIX = QString::fromUtf8(" %");
 
 DataManager::DataManager(QObject *parent):
@@ -15,6 +14,12 @@ DataManager::DataManager(QObject *parent):
     last_proc_measurement = -1;
     calculated_use = 0.0;
     calculated_proc_use = 0.0;
+
+#ifdef WIN32
+    last_pid = 0;
+#else
+    last_pid = -1;
+#endif
 
     core_time_interval = m_interval *
         MILI_TO_MICROSEC *
@@ -36,17 +41,17 @@ void DataManager::update() {
     sampleCpuTimes();
     sampleProcHandle();
     
-    emit notifyMemUsedKb();
-    emit notifyMemProcKb();
-    emit notifyCpuTotal();
-    emit notifyCpuProcUse();
+    quint64 total = m_MemTotal,
+            total_used = m_MemUsed,
+            proc_used = m_MemProc;
+
+    emit notifyUpdatedMemory(total, total_used, proc_used);
+    emit notifyUpdatedCpu(CpuTotal(), CpuProcUse());
+
 }
 
 DataManager::~DataManager() {
-<<<<<<< HEAD
-=======
     update_thread.detach();
->>>>>>> main
     update_thread.~thread();
     data_source.~ProcData();
 }
@@ -110,11 +115,11 @@ void DataManager::sampleCpuTimes() {
     last_proc_measurement = total_proc_time;
 }
 
-double DataManager::CpuProcUse() {
+qreal DataManager::CpuProcUse() {
     return calculated_proc_use;
 }
 
-double DataManager::CpuTotal() {
+qreal DataManager::CpuTotal() {
     return calculated_use;
 }
 
@@ -128,17 +133,18 @@ bool ProcData::procHandleValid(HANDLE procHandle) {
 }
 
 QString DataManager::ForegroundProc() {
-    std::string foreground_name_st_string = data_source.getFgProcessName();
-    return QString::fromStdString(foreground_name_st_string);
+    std::wstring foreground_name_st_string = data_source.getFgProcessName();
+    return QString::fromStdWString(foreground_name_st_string);
 }
 
 void DataManager::sampleProcHandle() {
 
-    auto handle = data_source.getFgProcHandle();
-    HANDLE_INT_T handle_int = reinterpret_cast<HANDLE_INT_T>(handle);
+    // Sidestepping the need to use Win32 types by doing this scuffed comparison
+    auto pid = data_source.getFgProcId();
 
-    if (handle_int != last_proc_handle) {
-        emit notifyForegroundProc(ForegroundProc());
-        last_proc_handle = handle_int;
+    if (pid != last_pid) {
+
+        last_pid = pid;
+        emit notifyForegroundProc(this->ForegroundProc());
     }
 }
