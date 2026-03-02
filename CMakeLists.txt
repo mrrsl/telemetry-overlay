@@ -5,6 +5,10 @@ project(hw_overlay VERSION 0.1 LANGUAGES CXX)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_AUTORCC ON)
 
+if(WIN32)
+    add_compile_definitions(UNICODE _UNICODE)
+endif()
+
 include(FetchContent)
 
 find_package(Qt6
