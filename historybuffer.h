@@ -34,10 +34,13 @@ public:
     /**
      * Default construction to set the internal max size.
      */
-    HistoryBuffer()
-        :buffer{} {
+    HistoryBuffer<buff_size>():
+        buffer{},
+        size_limit(buffer.max_size()) {
 
-        size_limit = buffer.max_size();
+        head = 0;
+        length = 0;
+        std::memset(buffer.data(), 0, sizeof(SamplePoint) * size_limit);
     }
 
     /**
@@ -50,8 +53,6 @@ public:
         size_limit = buffer.max_size();
     }
 
-    ~HistoryBuffer();
-
     /**
      * Adds a measurement to the buffer.
      * @param measurement Measurement value.
@@ -59,15 +60,22 @@ public:
     void add(double measurement) {
         
         auto advanced = head + length;
-        auto next = head + length % size_limit;
+        auto next = (head + length) % size_limit;
         auto now = std::chrono::system_clock::now();
         auto now_ms = std::chrono::duration_cast<std::chrono::milliseconds>(now.time_since_epoch());
 
         buffer[next].measurement = measurement;
         buffer[next].timestamp = now_ms.count();
 
-        length = std::min(length + 1, static_cast<unsigned>(size_limit));
-        head = head + 1 % size_limit;
+        auto inc_length = length + 1;
+
+        if (inc_length > size_limit) {
+            length = size_limit;
+            head = (head + 1) % size_limit;
+        }
+        else {
+            length = inc_length;
+        }
     }
 
     /**

@@ -104,6 +104,42 @@ TEST(CIRC_BUFFER_TEST, BasicInit) {
     
     std::vector<HWOverlay::SamplePoint> sample = hbuff.get_linear_buffer();
     HWOverlay::SamplePoint latest = *(sample.rbegin());
+    HWOverlay::SamplePoint earliest = *(sample.begin());
 
-    ASSERT_DOUBLE_EQ(30.0, latest.measurement);
+    ASSERT_DOUBLE_EQ(loop_limit - 1, latest.measurement);
+    ASSERT_DOUBLE_EQ(loop_limit - buff_limit + 1, earliest.measurement);
+}
+
+TEST(CIRC_BUFFER_TEST, SizeOne) {
+    constexpr int buff_limit = 1;
+    constexpr int loop_limit = 0x5fff;
+
+    HWOverlay::HistoryBuffer<buff_limit> hbuff;
+
+    for (auto a = 0; a < loop_limit; a++) {
+        hbuff.add(a);
+    }
+
+    auto sample = hbuff.get_linear_buffer();
+    HWOverlay::SamplePoint latest = *(sample.rbegin());
+
+
+    ASSERT_DOUBLE_EQ(loop_limit - 1, latest.measurement);
+}
+
+TEST(CIRC_BUFFER_TEST, AlternatingSings) {
+    constexpr int buff_limit = 10;
+    constexpr int loop_limit = 0xfff;
+
+    HWOverlay::HistoryBuffer<buff_limit> hbuff;
+
+    int multi = 1;
+
+    for (auto a = 0; a < loop_limit; a++) {
+        hbuff.add(a * multi);
+        multi *= -1;
+    }
+
+    auto sample = hbuff.get_linear_buffer();
+    HWOverlay::SamplePoint latest = *(sample.rbegin());
 }

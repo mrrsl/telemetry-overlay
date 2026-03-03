@@ -14,6 +14,7 @@ int main(int argc, char *argv[])
 
     main_root_ctx->setContextProperty("data_manager", &dataman);
 
+    // Terminate on app engine failure
     QObject::connect(
         &engine,
         &QQmlApplicationEngine::objectCreationFailed,

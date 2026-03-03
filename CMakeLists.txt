@@ -69,7 +69,6 @@ qt_add_library(histbuff
 target_link_libraries(histbuff
     INTERFACE
         samplepoint
-        Qt6::Core
 )
 
 qt_add_executable(apphw_overlay
