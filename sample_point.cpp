@@ -2,10 +2,9 @@
 
 HWOverlay::SamplePoint HWOverlay::make_point(unsigned long long time, double measurement) {
 
-    SamplePoint sample = {
-        .measurement = measurement,
-        .timestamp = time,
-    };
+    SamplePoint sample;
+    sample.measurement = measurement;
+    sample.timestamp = time;
 
     return sample;
 }

@@ -66,7 +66,7 @@ public:
         buffer[next].measurement = measurement;
         buffer[next].timestamp = now_ms.count();
 
-        length = std::min(length + 1, static_cast<unsigned>(buff_size));
+        length = std::min(length + 1, static_cast<unsigned>(size_limit));
         head = head + 1 % size_limit;
     }
 
